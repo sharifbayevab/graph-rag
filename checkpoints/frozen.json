@@ -1,0 +1,126 @@
+{
+ "R62": "Q2 branch = the 6d-a rule (val .409 vs agent .182); chosen on val, the test sealed",
+ "agent_env": {
+  "K_max": [
+   5,
+   24
+  ],
+  "flags": [
+   "--set",
+   "struct.articles=true",
+   "--set",
+   "struct.amend_op=true"
+  ]
+ },
+ "amendments": [
+  {
+   "criterion_before": {
+    "baselines_at": 5,
+    "gold": "strict",
+    "hard_cells": [
+     "Q1",
+     "Q1x",
+     "Q2"
+    ],
+    "metric": "all5",
+    "old_K_max": 24,
+    "r37_ref": 0.6636,
+    "r37_tol": 0.02,
+    "se_mult": 2.0
+   },
+   "git": "17152d7cbddde2c690f762a51f062244014cabc9",
+   "ranker_ckpt_checked": "runs/spark/p5-rr-sft/pi_ref.pt",
+   "reason": "fix round 1 (review I3 / ruling R64): pre-register (B) deployed system = headline, (A) spec §1 / R37 verbatim on the struct agent (3 seeds), supplementary Q2-only / R59 any-of; M3 ranker pi_ref.pt sha checked",
+   "time": "2026-10-05T00:30:05"
+  }
+ ],
+ "criterion": {
+  "R64": {
+   "A_agent_spec": "spec §1 / R37 verbatim on the struct AGENT: (a) on the seed mean (per question, the mean of the 3 seeds' all@5) and per seed; (b) the mean over seeds of the agent's old-set R at K_max 24 (per seed too); pass = (a) and (b) on the seed mean",
+   "B_system": "the deployed routed system (R62, agent s01); (b) is effectively the ranker's R on the old test minus the misroute loss",
+   "headline": "B_system",
+   "supplementary": [
+    "Q2-only (system)",
+    "R59 any-of (system, agent seed mean)",
+    "per-seed systems"
+   ]
+  },
+  "baselines_at": 5,
+  "gold": "strict",
+  "hard_cells": [
+   "Q1",
+   "Q1x",
+   "Q2"
+  ],
+  "metric": "all5",
+  "old_K_max": 24,
+  "r37_ref": 0.6636,
+  "r37_tol": 0.02,
+  "se_mult": 2.0
+ },
+ "frozen_seed": "s01",
+ "git": "ebdceb880c3b89ca7ea36619798ea384fcdab129 dirty",
+ "labels": "runs/p9-expert/labels.jsonl",
+ "once_token_sha256": "9c42e2af538da6f1d582c5291703ab952aa7e5485bb1aff5523e3807197edea6",
+ "ranker": {
+  "K_max": 5,
+  "articles": true,
+  "ckpt": "pi_ref.pt",
+  "pi_ref_sha256": "bf6542852afea48343f6b18831e5fa5c283d4047fb0a8c8d1de047025fab0755",
+  "run": "runs/p5-rr-sft",
+  "top5": true
+ },
+ "router": {
+  "C": 1.0,
+  "fit": {
+   "n_train": 1023,
+   "train_acc": 0.9814271749755621
+  },
+  "path": "data/m7/final/router.npz",
+  "sha256": "2a1b37461227412cd44336dbd5925bb9744022af33baae102a26bd446c3ed282",
+  "val_routes_equal_pilot9": true,
+  "val_routes_equal_sklearn": true
+ },
+ "rule": {
+  "code": "grl/hard/amend_lookup.py",
+  "k": 5,
+  "sha256": "febcd3e5ecc5f8ddd40e298d56a29a70229a8348dd468cf99473d06d3f4c54bd"
+ },
+ "seeds": {
+  "s01": {
+   "local": "runs/spark/p9-grpo/checkpoints/grpo-000220.pt",
+   "note": "pilot 9 GRPO theta* it 220 (reproduced bit-exactly by f9-grpo-s01chk)",
+   "sha256": "033377d669f5a07e7026ff230680657583a56a8a7b7ef726d5d35cba76065e08",
+   "spark": "runs/p9-grpo/checkpoints/grpo-000220.pt"
+  },
+  "s02": {
+   "local": "runs/spark/f9-sft-s02/pi_ref.pt",
+   "note": "SFT pi_ref (epoch 9): GRPO f9-grpo-s02 has a stop-share alarm at it 248 (last 20 %) -> not accepted; its theta* it 300 val R .515 reported aside",
+   "sha256": "a507499e9da67803330f2e111326803d4eaf8d19c7a163a36b76665885450574",
+   "spark": "runs/f9-sft-s02/pi_ref.pt"
+  },
+  "s03": {
+   "local": "runs/spark/f9-grpo-s03/checkpoints/grpo-000200.pt",
+   "note": "GRPO theta* it 200, no alarms",
+   "sha256": "c3f9dd944a04d45225221b09fda578fde1e05818e6dc2fc2f4f33cea16e15bbc",
+   "spark": "runs/f9-grpo-s03/checkpoints/grpo-000200.pt"
+  }
+ },
+ "ship": {
+  "dir": "data/m7/full/54aa9a000b4b/ship",
+  "manifest_sha256": "8ef73773cb97ad3af08c75e69502b82d015f031f565a39391fe02a80b8caccb3"
+ },
+ "system": {
+  "count": "agent:s01",
+  "old": "ranker_top5 (@k) / ranker_top1 (R)",
+  "version": "rule:s01 (fallback agent:s01)"
+ },
+ "test_sources": {
+  "hard": "data/hard/full/p6c_hard.jsonl",
+  "hard_sha256": "6cc79a53e96bbf2322c19b723a83d02a881e88b8e6ecca0df577a80fe9d2cfd5",
+  "old_test_manifest": "data/m5/pilot/083e116775b3/ship/manifest.json",
+  "old_test_manifest_sha256": "d787ba38520c430d57aa1ead63d50b19fbb3e8d3329371c5b4efd4344b1a49bd"
+ },
+ "time": "2026-10-04T23:52:06",
+ "val_ce": "runs/p9-ce/ce_scores.jsonl"
+}

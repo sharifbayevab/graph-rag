@@ -1,0 +1,29 @@
+# advanced-rag-v2/docker-compose.yml — isolated stores for GraphRAG-RL v2 (not prod)
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: grl-postgres
+    environment:
+      POSTGRES_USER: graphrag
+      POSTGRES_PASSWORD: graphrag
+      POSTGRES_DB: graphrag
+    ports: ["5437:5432"]
+    volumes: ["./data/pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U graphrag -d graphrag"]
+      interval: 5s
+      retries: 10
+  qdrant:
+    image: qdrant/qdrant:v1.18.0
+    container_name: grl-qdrant
+    ports: ["6343:6333"]
+    volumes: ["./data/qdrant:/qdrant/storage"]
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: grl-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/graphrag-dev
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 512M
+    ports: ["7475:7474", "7688:7687"]
+    volumes: ["./data/neo4j:/data"]

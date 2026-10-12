@@ -1,0 +1,8 @@
+encoder:
+  name: BAAI/bge-m3                # M2 decision (docs/m1/research-encoder-report.md): dense head, CLS, 1024-d
+  revision: 5617a9f61b028005a4858fdac845db406aefb181   # HF commit (refs/main of the local cache; M3 Task 1, final review m5)
+  dim: 1024
+  max_seq_length: 512
+  batch_size: 16
+  query_prefix: ""
+  passage_prefix: ""

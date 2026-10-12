@@ -1,0 +1,8 @@
+{
+ "L_max": 8000,
+ "ce_sha256": "8031730296ce6a00a47c094d6f5cefc6ec32f0462c57f751a894dbeab6a22dc8",
+ "fuse_w": 0.7,
+ "n": 20,
+ "norm_top_n": 50,
+ "use_ce": true
+}

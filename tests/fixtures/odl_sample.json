@@ -1,0 +1,962 @@
+{
+ "file name": "12. 2024 фаолияти тўғрисида.pdf",
+ "number of pages": 72,
+ "author": null,
+ "title": null,
+ "creation date": "D:20250216071002Z",
+ "modification date": "D:20250315182121+05'00'",
+ "kids": [
+  {
+   "type": "header",
+   "id": 1,
+   "page number": 1,
+   "bounding box": [
+    65.784,
+    797.341,
+    529.724,
+    806.245
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H",
+     "id": 2,
+     "page number": 1,
+     "bounding box": [
+      65.784,
+      797.341,
+      529.724,
+      806.245
+     ],
+     "heading level": 13,
+     "font": "TimesNewRomanPS-BoldMT",
+     "font size": 8.04,
+     "text color": "[0.0]",
+     "content": "Ўзбекистон Республикаси Олий Мажлисининг Инсон ҳуқуқлари бўйича вакилининг (омбудсманнинг) 2024 йилдаги фаолияти тўғрисида"
+    }
+   ]
+  },
+  {
+   "type": "image",
+   "pdfua_tag": "Figure",
+   "id": 7,
+   "page number": 1,
+   "bounding box": [
+    237.75,
+    624.5,
+    350.75,
+    737.5
+   ],
+   "alt_source": "missing",
+   "source": "12. 2024 фаолияти тўғрисида_images/imageFile1.png"
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 4,
+   "page number": 1,
+   "bounding box": [
+    70.944,
+    391.316,
+    524.22,
+    454.47
+   ],
+   "font": "TimesNewRomanPS-BoldMT",
+   "font size": 18.0,
+   "text color": "[0.0]",
+   "content": "Ўзбекистон Республикаси Олий Мажлисининг Инсон ҳуқуқлари бўйича вакилининг (омбудсманнинг) 2024 йилдаги фаолияти тўғрисида"
+  },
+  {
+   "type": "heading",
+   "pdfua_tag": "H1",
+   "id": 5,
+   "level": "Doctitle",
+   "page number": 1,
+   "bounding box": [
+    216.05,
+    340.251,
+    379.171,
+    367.892
+   ],
+   "heading level": 1,
+   "font": "TimesNewRomanPS-BoldMT",
+   "font size": 24.96,
+   "text color": "[0.0]",
+   "content": "М А Ъ Р У З А"
+  },
+  {
+   "type": "header",
+   "id": 8,
+   "page number": 2,
+   "bounding box": [
+    74.904,
+    797.341,
+    520.514,
+    806.245
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H",
+     "id": 9,
+     "page number": 2,
+     "bounding box": [
+      74.904,
+      797.341,
+      520.514,
+      806.245
+     ],
+     "heading level": 14,
+     "font": "TimesNewRomanPSMT",
+     "font size": 8.04,
+     "text color": "[0.0]",
+     "content": "Ўзбекистон Республикаси Олий Мажлисининг Инсон ҳуқуқлари бўйича вакилининг (омбудсманнинг) 2024 йилдаги фаолияти тўғрисида"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "pdfua_tag": "L",
+   "id": 12,
+   "level": "1",
+   "page number": 2,
+   "bounding box": [
+    62.064,
+    83.627,
+    528.16,
+    740.771
+   ],
+   "numbering style": "roman numbers",
+   "number of list items": 4,
+   "list items": [
+    {
+     "type": "list item",
+     "pdfua_tag": "LI",
+     "id": 13,
+     "page number": 2,
+     "bounding box": [
+      72.504,
+      709.743,
+      514.24,
+      740.771
+     ],
+     "font": "TimesNewRomanPS-BoldMT",
+     "font size": 14.04,
+     "text color": "[0.0]",
+     "content": "I. Мурожаатларни кўриб чиқиш ва бузилган ҳуқуқларни тиклашга доир фаолият ................................................................... 4-8",
+     "kids": [
+      {
+       "type": "list",
+       "pdfua_tag": "L",
+       "id": 14,
+       "level": "2",
+       "page number": 2,
+       "bounding box": [
+        68.064,
+        586.944,
+        523.42,
+        709.913
+       ],
+       "numbering style": "arabic numbers",
+       "number of list items": 9,
+       "next list id": 268,
+       "list items": [
+        {
+         "type": "list item",
+         "pdfua_tag": "LI",
+         "id": 15,
+         "page number": 2,
+         "bounding box": [
+          68.064,
+          696.624,
+          517.42,
+          709.913
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "1.1. Омбудсманнинг Ишонч телефони ва Ombudsman.uz мобил иловаси ...... 8-10",
+         "kids": []
+        },
+        {
+         "type": "list item",
+         "pdfua_tag": "LI",
+         "id": 16,
+         "page number": 2,
+         "bounding box": [
+          68.064,
+          683.424,
+          523.42,
+          696.713
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "1.2. Иқтисодий ҳуқуқлар ..................................................................................... 11-14",
+         "kids": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "list item",
+     "pdfua_tag": "LI",
+     "id": 24,
+     "page number": 2,
+     "bounding box": [
+      69.864,
+      571.353,
+      509.56,
+      586.901
+     ],
+     "font": "TimesNewRomanPS-BoldMT",
+     "font size": 14.04,
+     "text color": "[0.0]",
+     "content": "II. Қийноққа солиш ҳолларининг олдини олиш бўйича фаолият .. 33",
+     "kids": [
+      {
+       "type": "list",
+       "pdfua_tag": "L",
+       "id": 25,
+       "level": "3",
+       "page number": 2,
+       "bounding box": [
+        68.064,
+        412.674,
+        523.42,
+        571.523
+       ],
+       "numbering style": "arabic numbers",
+       "number of list items": 4,
+       "list items": [
+        {
+         "type": "list item",
+         "pdfua_tag": "LI",
+         "id": 26,
+         "page number": 2,
+         "bounding box": [
+          68.064,
+          518.514,
+          523.42,
+          571.523
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "2.1. Ҳаракатланиш эркинлиги чекланган шахслар сақланадиган жойларда ушлаб турилган шахслар, уларнинг яқин қариндошлари ва ҳимоячиларидан (адвокатларидан) келиб тушган мурожаатлар ҳамда уларни кўриб чиқиш натижалари ........................................................................................... 33-35",
+         "kids": []
+        },
+        {
+         "type": "list item",
+         "pdfua_tag": "LI",
+         "id": 27,
+         "page number": 2,
+         "bounding box": [
+          68.064,
+          478.914,
+          523.42,
+          518.603
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "2.2. Қийноққа солиш ҳолларини аниқлаш ва уларнинг олдини олиш мақсадида амалга оширилган мониторинг ташрифлар ва аниқланган камчиликлар ҳамда уларни бартараф этиш юзасидан амалга оширилган ишлар .............................. 35-37",
+         "kids": []
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "footer",
+   "id": 48,
+   "page number": 2,
+   "bounding box": [
+    294.65,
+    48.788,
+    300.65,
+    62.077
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H5",
+     "id": 49,
+     "page number": 2,
+     "bounding box": [
+      294.65,
+      48.788,
+      300.65,
+      62.077
+     ],
+     "heading level": 5,
+     "font": "TimesNewRomanPS-BoldMT",
+     "font size": 12.0,
+     "text color": "[0.0]",
+     "content": "2"
+    }
+   ]
+  },
+  {
+   "type": "header",
+   "id": 65,
+   "page number": 4,
+   "bounding box": [
+    74.904,
+    797.341,
+    520.514,
+    806.245
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H",
+     "id": 66,
+     "page number": 4,
+     "bounding box": [
+      74.904,
+      797.341,
+      520.514,
+      806.245
+     ],
+     "heading level": 14,
+     "font": "TimesNewRomanPSMT",
+     "font size": 8.04,
+     "text color": "[0.0]",
+     "content": "Ўзбекистон Республикаси Олий Мажлисининг Инсон ҳуқуқлари бўйича вакилининг (омбудсманнинг) 2024 йилдаги фаолияти тўғрисида"
+    }
+   ]
+  },
+  {
+   "type": "heading",
+   "pdfua_tag": "H3",
+   "id": 68,
+   "level": "Subtitle",
+   "page number": 4,
+   "bounding box": [
+    97.584,
+    753.183,
+    478.466,
+    784.831
+   ],
+   "heading level": 3,
+   "font": "TimesNewRomanPS-BoldMT",
+   "font size": 14.04,
+   "text color": "[0.0]",
+   "content": "I. МУРОЖААТЛАРНИ КЎРИБ ЧИҚИШ ВА БУЗИЛГАН ҲУҚУҚЛАРНИ ТИКЛАШГА ДОИР ФАОЛИЯТ"
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 69,
+   "page number": 4,
+   "bounding box": [
+    56.64,
+    657.423,
+    538.441,
+    736.811
+   ],
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0]",
+   "content": "Ўзбекистон Республикаси Конституциясининг 40-моддасига мувофиқ ҳар ким бевосита ўзи ва бошқалар билан биргаликда давлат органларига ҳамда ташкилотларга, фуқароларнинг ўзини ўзи бошқариш органларига, мансабдор шахсларга ёки халқ вакилларига аризалар, таклифлар ва шикоятлар билан мурожаат қилиш ҳуқуқига эга."
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 73,
+   "page number": 4,
+   "bounding box": [
+    56.64,
+    417.993,
+    538.473,
+    449.501
+   ],
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0, 0.0, 0.0]",
+   "content": "Такрорий мурожаатлар сони 3077 тани ёки жами мурожаатларнинг 13,1 фоизини ташкил этди."
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 74,
+   "page number": 4,
+   "bounding box": [
+    92.064,
+    146.503,
+    538.775,
+    417.581
+   ],
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0, 0.439215686, 0.752941176]",
+   "content": "Мурожаатларнинг 20611 таси жисмоний ва юридик шахслардан, 64 таси чет элдаги фуқаролар ва хорижий Омбудсманлардан ҳамда 2747 таси махсус муассасалар, вояга етмаганларга ижтимоийҳуқуқий ёрдам кўрсатиш марказлари, гауптвахталар, вақтинча сақлаш ҳибсхоналари, тергов ҳибсхоналари, жазони ижро этиш муассасалари, интизомий қисмлар, мажбурий даволаш муассасаларидаги (кейинги ўринларда – ҳаракатланиш эркинлиги чекланган шахслар сақланадиган жойлар) шахслардан ва уларнинг вакилларидан келиб тушган."
+  },
+  {
+   "type": "image",
+   "pdfua_tag": "Figure",
+   "id": 76,
+   "page number": 4,
+   "bounding box": [
+    56.7,
+    149.38,
+    324.05,
+    398.68
+   ],
+   "alt_source": "missing",
+   "source": "12. 2024 фаолияти тўғрисида_images/imageFile2.png"
+  },
+  {
+   "type": "caption",
+   "pdfua_tag": "Caption",
+   "id": 75,
+   "page number": 4,
+   "bounding box": [
+    56.64,
+    65.987,
+    538.702,
+    145.971
+   ],
+   "linked content id": 76,
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0, 0.0, 0.0]",
+   "content": "Мурожаатларнинг 16754 таси (4748 таси Омбудсман ишонч телефонига келиб тушган) бевосита Омбудсман марказий аппарати томонидан ва 3857 таси Омбудсманнинг Қорақалпоғистон Республикаси, вилоятлар ва Тошкент шаҳридаги минтақавий вакиллари (кейинги ўринларда – минтақавий вакиллар) томонидан ўрганиб чиқилди."
+  },
+  {
+   "type": "footer",
+   "id": 77,
+   "page number": 4,
+   "bounding box": [
+    294.65,
+    48.788,
+    300.65,
+    62.077
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H5",
+     "id": 78,
+     "page number": 4,
+     "bounding box": [
+      294.65,
+      48.788,
+      300.65,
+      62.077
+     ],
+     "heading level": 5,
+     "font": "TimesNewRomanPS-BoldMT",
+     "font size": 12.0,
+     "text color": "[0.0]",
+     "content": "4"
+    }
+   ]
+  },
+  {
+   "type": "header",
+   "id": 89,
+   "page number": 6,
+   "bounding box": [
+    74.904,
+    797.341,
+    520.514,
+    806.245
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H",
+     "id": 90,
+     "page number": 6,
+     "bounding box": [
+      74.904,
+      797.341,
+      520.514,
+      806.245
+     ],
+     "heading level": 14,
+     "font": "TimesNewRomanPSMT",
+     "font size": 8.04,
+     "text color": "[0.0]",
+     "content": "Ўзбекистон Республикаси Олий Мажлисининг Инсон ҳуқуқлари бўйича вакилининг (омбудсманнинг) 2024 йилдаги фаолияти тўғрисида"
+    }
+   ]
+  },
+  {
+   "type": "heading",
+   "pdfua_tag": "H3",
+   "id": 92,
+   "level": "Subtitle",
+   "page number": 6,
+   "bounding box": [
+    140.06,
+    769.163,
+    455.229,
+    784.711
+   ],
+   "heading level": 3,
+   "font": "TimesNewRomanPS-BoldMT",
+   "font size": 14.04,
+   "text color": "[0.0]",
+   "content": "Мурожаатларнинг ҳудудлар кесимидаги таҳлили"
+  },
+  {
+   "type": "table",
+   "pdfua_tag": "Table",
+   "id": 93,
+   "level": "6",
+   "page number": 6,
+   "bounding box": [
+    56.64,
+    412.39,
+    515.86,
+    762.24
+   ],
+   "number of rows": 17,
+   "number of columns": 4,
+   "rows": [
+    {
+     "type": "table row",
+     "row number": 1,
+     "id": 94,
+     "cells": [
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 95,
+       "page number": 6,
+       "bounding box": [
+        57.12,
+        717.94,
+        106.342,
+        761.762
+       ],
+       "row number": 1,
+       "column number": 1,
+       "row span": 2,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 96,
+         "page number": 6,
+         "bounding box": [
+          76.464,
+          733.104,
+          88.524,
+          746.393
+         ],
+         "font": "TimesNewRomanPS-BoldMT",
+         "font size": 12.0,
+         "text color": "[0.184313725, 0.329411765, 0.588235294]",
+         "content": "№"
+        }
+       ]
+      },
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 97,
+       "page number": 6,
+       "bounding box": [
+        106.342,
+        717.94,
+        361.51,
+        761.762
+       ],
+       "row number": 1,
+       "column number": 2,
+       "row span": 2,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 98,
+         "page number": 6,
+         "bounding box": [
+          207.77,
+          733.104,
+          260.042,
+          746.393
+         ],
+         "font": "TimesNewRomanPS-BoldMT",
+         "font size": 12.0,
+         "text color": "[0.184313725, 0.329411765, 0.588235294]",
+         "content": "Ҳудудлар"
+        }
+       ]
+      },
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 99,
+       "page number": 6,
+       "bounding box": [
+        361.51,
+        739.42,
+        515.375,
+        761.762
+       ],
+       "row number": 1,
+       "column number": 3,
+       "row span": 1,
+       "column span": 2,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 100,
+         "page number": 6,
+         "bounding box": [
+          386.47,
+          743.784,
+          490.546,
+          757.073
+         ],
+         "font": "TimesNewRomanPS-BoldMT",
+         "font size": 12.0,
+         "text color": "[0.184313725, 0.329411765, 0.588235294]",
+         "content": "Мурожаатлар сони"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "table row",
+     "row number": 2,
+     "id": 101,
+     "cells": [
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 102,
+       "page number": 6,
+       "bounding box": [
+        361.51,
+        717.94,
+        445.897,
+        739.42
+       ],
+       "row number": 2,
+       "column number": 3,
+       "row span": 1,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 103,
+         "page number": 6,
+         "bounding box": [
+          379.87,
+          721.824,
+          427.498,
+          735.113
+         ],
+         "font": "TimesNewRomanPS-BoldMT",
+         "font size": 12.0,
+         "text color": "[0.184313725, 0.329411765, 0.588235294]",
+         "content": "2023 йил"
+        }
+       ]
+      },
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 104,
+       "page number": 6,
+       "bounding box": [
+        445.897,
+        717.94,
+        515.375,
+        739.42
+       ],
+       "row number": 2,
+       "column number": 4,
+       "row span": 1,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 105,
+         "page number": 6,
+         "bounding box": [
+          456.94,
+          721.824,
+          504.568,
+          735.113
+         ],
+         "font": "TimesNewRomanPS-BoldMT",
+         "font size": 12.0,
+         "text color": "[0.184313725, 0.329411765, 0.588235294]",
+         "content": "2024 йил"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "table row",
+     "row number": 3,
+     "id": 106,
+     "cells": [
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 107,
+       "page number": 6,
+       "bounding box": [
+        57.12,
+        697.54,
+        106.342,
+        717.94
+       ],
+       "row number": 3,
+       "column number": 1,
+       "row span": 1,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 108,
+         "page number": 6,
+         "bounding box": [
+          78.024,
+          700.824,
+          87.024,
+          714.113
+         ],
+         "font": "TimesNewRomanPS-BoldMT",
+         "font size": 12.0,
+         "text color": "[0.184313725, 0.329411765, 0.588235294]",
+         "content": "1."
+        }
+       ]
+      },
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 109,
+       "page number": 6,
+       "bounding box": [
+        106.342,
+        697.54,
+        361.51,
+        717.94
+       ],
+       "row number": 3,
+       "column number": 2,
+       "row span": 1,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 110,
+         "page number": 6,
+         "bounding box": [
+          111.74,
+          700.824,
+          212.432,
+          714.113
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "Қашқадарё вилояти"
+        }
+       ]
+      },
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 111,
+       "page number": 6,
+       "bounding box": [
+        361.51,
+        697.54,
+        445.897,
+        717.94
+       ],
+       "row number": 3,
+       "column number": 3,
+       "row span": 1,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 112,
+         "page number": 6,
+         "bounding box": [
+          391.63,
+          700.824,
+          415.63,
+          714.113
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "2818"
+        }
+       ]
+      },
+      {
+       "type": "table cell",
+       "pdfua_tag": "TD",
+       "id": 113,
+       "page number": 6,
+       "bounding box": [
+        445.897,
+        697.54,
+        515.375,
+        717.94
+       ],
+       "row number": 3,
+       "column number": 4,
+       "row span": 1,
+       "column span": 1,
+       "kids": [
+        {
+         "type": "paragraph",
+         "pdfua_tag": "P",
+         "id": 114,
+         "page number": 6,
+         "bounding box": [
+          468.7,
+          700.824,
+          492.7,
+          714.113
+         ],
+         "font": "TimesNewRomanPSMT",
+         "font size": 12.0,
+         "text color": "[0.0]",
+         "content": "3274"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "caption",
+   "pdfua_tag": "Caption",
+   "id": 239,
+   "page number": 6,
+   "bounding box": [
+    56.64,
+    364.054,
+    538.48,
+    404.943
+   ],
+   "linked content id": 93,
+   "font": "TimesNewRomanPS-ItalicMT",
+   "font size": 12.0,
+   "text color": "[0.0, 0.0, 0.0]",
+   "content": "Изоҳ: Мурожаатларнинг 2747 таси ҳаракатланиш эркинлиги чекланган шахслар сақланадиган жойлардаги шахслар ва уларнинг вакилларидан ҳамда 64 та мурожаат чет эл фуқаролари ва хорижий Омбудсманлардан келиб тушган."
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 240,
+   "page number": 6,
+   "bounding box": [
+    92.064,
+    347.893,
+    538.964,
+    363.441
+   ],
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0, 0.0, 0.0]",
+   "content": "Омбудсман номига 2024 йилда келиб тушган мурожаатларнинг 6560 таси"
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 241,
+   "page number": 6,
+   "bounding box": [
+    56.64,
+    170.863,
+    250.28,
+    347.361
+   ],
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0, 0.439215686, 0.752941176]",
+   "content": "(31,8 фоиз) ижтимоий ҳуқуқлар, 6004 таси (29,1 фоиз) иқтисодий ҳуқуқлар, 3392 таси (16,5 фоиз) шахсий ҳуқуқ ва эркинликлар, 2926 таси (14,2 фоиз) мурожаат этиш ҳуқуқи ҳамда сиёсий ҳуқуқлар, 282 таси (1,4 фоиз) экологик ҳуқуқлар ҳамда 1447 таси (7,0 фоиз) бошқа масалалардаги мурожаатларни ташкил этди."
+  },
+  {
+   "type": "image",
+   "pdfua_tag": "Figure",
+   "id": 245,
+   "page number": 6,
+   "bounding box": [
+    258.95,
+    92.975,
+    537.65,
+    339.575
+   ],
+   "alt_source": "missing",
+   "source": "12. 2024 фаолияти тўғрисида_images/imageFile4.png"
+  },
+  {
+   "type": "paragraph",
+   "pdfua_tag": "P",
+   "id": 242,
+   "page number": 6,
+   "bounding box": [
+    56.64,
+    106.423,
+    249.995,
+    170.331
+   ],
+   "font": "TimesNewRomanPSMT",
+   "font size": 14.04,
+   "text color": "[0.0, 0.0, 0.0]",
+   "content": "Ариза шаклида келиб тушган мурожаатлар 13397 тани ёки 65 фоизни, шикоят шаклидагилар 7191 тани ёки"
+  },
+  {
+   "type": "footer",
+   "id": 246,
+   "page number": 6,
+   "bounding box": [
+    294.65,
+    48.788,
+    300.65,
+    62.077
+   ],
+   "kids": [
+    {
+     "type": "heading",
+     "pdfua_tag": "H5",
+     "id": 247,
+     "page number": 6,
+     "bounding box": [
+      294.65,
+      48.788,
+      300.65,
+      62.077
+     ],
+     "heading level": 5,
+     "font": "TimesNewRomanPS-BoldMT",
+     "font size": 12.0,
+     "text color": "[0.0]",
+     "content": "6"
+    }
+   ]
+  }
+ ]
+}

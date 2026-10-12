@@ -1,0 +1,321 @@
+{
+ "source": "plan M7 part 2, Task 6 (R26 approval-only filter): 10 probe resolutions labelled by hand from their full chunk texts (records) and the probe generator's outcome; approval_only = only 'approve' / entry into force / signature-line points",
+ "resolutions": [
+  {
+   "doc_id": "QARORLAR-6ae75185",
+   "label": "approval_only",
+   "why": "cmp-009: approve + entry into force (generator refused: approval only)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-6ae75185/ПРЕАМБ.1#1",
+     "Лойиҳа\n\nЎзбекистон Республикаси Олий Мажлиси Сенатининг\n\nҚ А Р О Р И\n\n“Ўзбекистон Республикасининг айрим қонун ҳужжатларига\n\nбаъзи турдаги тамаки маҳсулотларининг, тамакини ва никотинни истеъмол қилиш мосламаларининг муомаласига доир талабларни\n\nянада кучайтиришга қаратилган ўзгартиришлар ва қўшимча\n\nкиритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни ҳақида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 24 январь куни қабул қилинган “Ўзбекистон Республикасининг айрим қонун ҳужжатларига баъзи турдаги тамаки маҳсулотларининг, тамакини ва никотинни истеъмол қилиш мосламаларининг муомаласига доир талабларни янада кучайтиришга қаратилган ўзгартиришлар ва қўшимча киритиш тўғрисида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-6ae75185/П.1#1",
+     "1. “Ўзбекистон Республикасининг айрим қонун ҳужжатларига баъзи турдаги тамаки маҳсулотларининг, тамакини ва никотинни истеъмол қилиш мосламаларининг муомаласига доир талабларни янада кучайтиришга қаратилган ўзгартиришлар ва қўшимча киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-6ae75185/П.2#1",
+     "2. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-6ae75185/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева\n\nТошкент шаҳри, 2024 йил 8 июнь, № СҚ-___–IV."
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-0d570422",
+   "label": "approval_only",
+   "why": "cmp-017: approve + entry into force (refused: approval only)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-0d570422/ПРЕАМБ.1#1",
+     "Лойиҳа\n\nЎзбекистон Республикаси Олий Мажлиси Сенатининг\n\nҚ А Р О Р И\n\n“Янги таҳрирдаги Ўзбекистон Республикаси Конституцияси\n\nқабул қилинганлиги муносабати билан Ўзбекистон\n\nРеспубликасининг айрим қонун ҳужжатларига судлар\n\nфаолиятининг ҳамда фуқаролар ҳуқуқ ва эркинликларининг кафолатларини кучайтиришга қаратилган ўзгартириш\n\nва қўшимчалар киритиш тўғрисида”ги\n\nЎзбекистон Республикаси Қонуни ҳақида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 21 январь куни қабул қилинган “Янги таҳрирдаги Ўзбекистон Республикаси Конституцияси қабул қилинганлиги муносабати билан Ўзбекистон Республикасининг айрим қонун ҳужжатларига судлар фаолиятининг ҳамда фуқаролар ҳуқуқ ва эркинликларининг кафолатларини кучайтиришга қаратилган ўзгартириш ва қўшимчалар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-0d570422/П.1#1",
+     "1. “Янги таҳрирдаги Ўзбекистон Республикаси Конституцияси қабул қилинганлиги муносабати билан Ўзбекистон Республикасининг айрим қонун ҳужжатларига судлар фаолиятининг ҳамда фуқаролар ҳуқуқ ва эркинликларининг кафолатларини кучайтиришга қаратилган ўзгартириш ва қўшимчалар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-0d570422/П.2#1",
+     "2. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-0d570422/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева\n\nТошкент шаҳри, 2024 йил 8 июнь, № СҚ-___–IV."
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-b0b29f3e",
+   "label": "approval_only",
+   "why": "cmp-029: approve + entry into force (refused: approval only)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-b0b29f3e/ПРЕАМБ.1#1",
+     "“Ўзбекистон Республикасининг айрим қонун ҳужжатларига\n\nмувофиқликни баҳолаш органларининг масъулиятини янада\n\nоширишга ҳамда маҳсулотларни ўз ихтиёри билан чақириб\n\nолган тадбиркорларга енгиллик беришга қаратилган\n\nқўшимча ва ўзгартиришлар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни ҳақида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 10 июнь куни қабул қилинган “Ўзбекистон Республикасининг айрим қонун ҳужжатларига мувофиқликни баҳолаш органларининг масъулиятини янада оширишга ҳамда маҳсулотларни ўз ихтиёри билан чақириб олган тадбиркорларга енгиллик беришга қаратилган қўшимча ва ўзгартиришлар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-b0b29f3e/П.1#1",
+     "1. “Ўзбекистон Республикасининг айрим қонун ҳужжатларига мувофиқликни баҳолаш органларининг масъулиятини янада оширишга ҳамда маҳсулотларни ўз ихтиёри билан чақириб олган тадбиркорларга енгиллик беришга қаратилган қўшимча ва ўзгартиришлар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-b0b29f3e/П.2#1",
+     "2. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради.\n\nЎзбекистон Республикаси Олий Мажлиси Сенатининг Раиси"
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-fb600362",
+   "label": "approval_only",
+   "why": "cmp-033: approve + entry into force (refused: approval only)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-fb600362/ПРЕАМБ.1#1",
+     "“Ўзбекистон Республикасининг Маъмурий жавобгарлик тўғрисидаги кодексига ёнғинлар профилактикаси самарадорлигини оширишга қаратилган қўшимча ва ўзгартиришлар киритиш ҳақида”ги Ўзбекистон Республикаси Қонуни тўғрисида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2023 йил 26 декабрь куни қабул қилинган “Ўзбекистон Республикасининг Маъмурий жавобгарлик тўғрисидаги кодексига ёнғинлар профилактикаси самарадорлигини оширишга қаратилган қўшимча ва ўзгартиришлар киритиш ҳақида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-fb600362/П.1#1",
+     "1. “Ўзбекистон Республикасининг Маъмурий жавобгарлик тўғрисидаги кодексига ёнғинлар профилактикаси самарадорлигини оширишга қаратилган қўшимча ва ўзгартиришлар киритиш ҳақида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-fb600362/П.2#1",
+     "2. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-fb600362/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева\n\nТошкент шаҳри, 2024 йил 19 январь, № СҚ-851–IV."
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-640849e2",
+   "label": "approval_only",
+   "why": "cmp-041: approve + entry into force (refused: approval only)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-640849e2/ПРЕАМБ.1#1",
+     "Лойиҳа\n\nЎзбекистон Республикаси Олий Мажлиси Сенатининг\n\nҚ А Р О Р И\n\n“Иссиқхона газларининг чиқарилишини чеклаш тўғрисида”ги Ўзбекистон Республикаси Қонуни ҳақида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 18 март куни қабул қилинган “Иссиқхона газларининг чиқарилишини чеклаш тўғрисида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-640849e2/П.1#1",
+     "1. “Иссиқхона газларининг чиқарилишини чеклаш тўғрисида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-640849e2/П.2#1",
+     "2. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-640849e2/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева\n\nТошкент шаҳри, 2024 йил 8 июнь, № СҚ-___–IV."
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-ab97272b",
+   "label": "substantive",
+   "why": "cmp-013: Cabinet of Ministers 2-month alignment task + committee control (item accepted)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-ab97272b/ПРЕАМБ.1#1",
+     "“Ёқилғи-энергетика соҳасидаги ҳуқуқбузарликларга қарши курашиш чоралари такомиллаштирилиши муносабати билан Ўзбекистон Республикасининг Жиноят кодексига ҳамда Ўзбекистон Республикасининг Маъмурий жавобгарлик тўғрисидаги кодексига ўзгартириш ва қўшимчалар киритиш ҳақида”ги Ўзбекистон Республикаси Қонуни тўғрисида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 15 июль куни қабул қилинган “Ёқилғи-энергетика соҳасидаги ҳуқуқбузарликларга қарши курашиш чоралари такомиллаштирилиши муносабати билан Ўзбекистон Республикасининг Жиноят кодексига ҳамда Ўзбекистон Республикасининг Маъмурий жавобгарлик тўғрисидаги кодексига ўзгартириш ва қўшимчалар киритиш ҳақида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-ab97272b/П.1#1",
+     "1. “Ёқилғи-энергетика соҳасидаги ҳуқуқбузарликларга қарши курашиш чоралари такомиллаштирилиши муносабати билан Ўзбекистон Республикасининг Жиноят кодексига ҳамда Ўзбекистон Республикасининг Маъмурий жавобгарлик тўғрисидаги кодексига ўзгартириш ва қўшимчалар киритиш ҳақида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-ab97272b/П.2#1",
+     "2. Ўзбекистон Республикаси Вазирлар Маҳкамаси ушбу Қонун расмий эълон қилинган кундан эътиборан икки ой муддатда:\n\nҳукумат қарорларининг ушбу Қонунга мувофиқлаштирилишини;\n\nреспублика ижро этувчи ҳокимият органлари ушбу Қонунга мувофиқ ўз норматив-ҳуқуқий ҳужжатларини қайта кўриб чиқишлари ва бекор қилишларини таъминласин;\n\nамалга оширилган ишлар тўғрисида Ўзбекистон Республикаси Олий Мажлисининг Сенатига ахборот киритсин."
+    ],
+    [
+     "QARORLAR-ab97272b/П.3#1",
+     "3. Ўзбекистон Республикаси Олий Мажлиси Сенатининг Бюджет ва иқтисодий масалалар қўмитаси мазкур Қарор ижроси бўйича Ўзбекистон Республикаси Вазирлар Маҳкамасининг ахборотини кўриб чиқиб, натижалари юзасидан икки ҳафта муддатда Ўзбекистон Республикаси Олий Мажлиси Сенатининг Кенгашига ахборот киритсин."
+    ],
+    [
+     "QARORLAR-ab97272b/П.4#1",
+     "4. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-ab97272b/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева"
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-a5b33a3d",
+   "label": "substantive",
+   "why": "cmp-021: Cabinet of Ministers 2-month alignment task + committee control (item accepted)",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-a5b33a3d/ПРЕАМБ.1#1",
+     "“Ўзбекистон Республикасининг айрим қонун ҳужжатларига валюта ҳамда қимматбаҳо металлар ва қимматбаҳо тошлар муомаласи билан боғлиқ муносабатларни такомиллаштиришга қаратилган ўзгартиришлар ва қўшимча киритиш ҳақида”ги\n\nЎзбекистон Республикаси Қонуни тўғрисида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 1 июль куни қабул қилинган “Ўзбекистон Республикасининг айрим қонун ҳужжатларига валюта ҳамда қимматбаҳо металлар ва қимматбаҳо тошлар муомаласи билан боғлиқ муносабатларни такомиллаштиришга қаратилган ўзгартиришлар ва қўшимча киритиш ҳақида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-a5b33a3d/П.1#1",
+     "1. “Ўзбекистон Республикасининг айрим қонун ҳужжатларига валюта ҳамда қимматбаҳо металлар ва қимматбаҳо тошлар муомаласи билан боғлиқ муносабатларни такомиллаштиришга қаратилган ўзгартиришлар ва қўшимча киритиш ҳақида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-a5b33a3d/П.2#1",
+     "2. Ўзбекистон Республикаси Вазирлар Маҳкамаси ушбу Қонун расмий эълон қилинган кундан эътиборан икки ой муддатда:\n\nҳукумат қарорларининг ушбу Қонунга мувофиқлаштирилишини;\n\nреспублика ижро этувчи ҳокимият органлари ушбу Қонунга мувофиқ ўз норматив-ҳуқуқий ҳужжатларини қайта кўриб чиқишлари ва бекор қилишларини таъминласин;\n\nамалга оширилган ишлар тўғрисида Ўзбекистон Республикаси Олий Мажлисининг Сенатига ахборот киритсин."
+    ],
+    [
+     "QARORLAR-a5b33a3d/П.3#1",
+     "3. Ўзбекистон Республикаси Олий Мажлиси Сенатининг Мудофаа ва хавфсизлик масалалари қўмитаси мазкур Қарор ижроси бўйича Ўзбекистон Республикаси Вазирлар Маҳкамасининг ахборотини кўриб чиқиб, натижалари юзасидан икки ҳафта муддатда Ўзбекистон Республикаси Олий Мажлиси Сенатининг Кенгашига ахборот киритсин."
+    ],
+    [
+     "QARORLAR-a5b33a3d/П.4#1",
+     "4. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-a5b33a3d/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева\n\nТошкент шаҳри, 2025 йил октябрь, СҚ-___–V-сонли."
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-b882d75c",
+   "label": "substantive",
+   "why": "cmp-025: law rejected, conciliation commission proposed, members elected",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-b882d75c/ПРЕАМБ.1#1",
+     "“Ўзбекистон Республикасининг айрим қонун ҳужжатларига аҳолига тиббий ёрдамнинг кафолатланган ҳажмига кирадиган хизматларни кўрсатиш, шунингдек тиббиёт ва фармацевтика ходимларининг касбий фаолиятини амалга ошириш тизимини\n\nтакомиллаштиришга қаратилган ўзгартиришлар ва қўшимча киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни ҳақида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 18 февраль куни қабул қилинган “Ўзбекистон Республикасининг айрим қонун ҳужжатларига аҳолига тиббий ёрдамнинг кафолатланган ҳажмига кирадиган хизматларни кўрсатиш, шунингдек тиббиёт ва фармацевтика ходимларининг касбий фаолиятини амалга ошириш тизимини такомиллаштиришга қаратилган ўзгартиришлар ва қўшимча киритиш тўғрисида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 99-моддасига ва “Ўзбекистон Республикаси Олий Мажлисининг Сенати тўғрисида”ги Ўзбекистон Республикаси Конституциявий Қонунининг 23 ва 25-моддаларига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-b882d75c/П.1#1",
+     "1. “Ўзбекистон Республикасининг айрим қонун ҳужжатларига аҳолига тиббий ёрдамнинг кафолатланган ҳажмига кирадиган хизматларни кўрсатиш, шунингдек тиббиёт ва фармацевтика ходимларининг касбий фаолиятини амалга ошириш тизимини такомиллаштиришга қаратилган ўзгартиришлар ва қўшимча киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни Сенатнинг Фан, таълим ва соғлиқни сақлаш масалалари қўмитасининг мазкур Қонун бўйича хулосасида баён этилган асосларга кўра рад этилсин."
+    ],
+    [
+     "QARORLAR-b882d75c/П.2#1",
+     "2. Ўзбекистон Республикаси Олий Мажлисининг Қонунчилик палатасига мазкур Қонун бўйича юзага келган келишмовчиликларни бартараф этиш учун келишув комиссиясини тузиш таклиф этилсин."
+    ],
+    [
+     "QARORLAR-b882d75c/П.3#1",
+     "3. Ўзбекистон Республикаси Олий Мажлиси Сенатидан келишув комиссияси таркибига қуйидагилар сайлансин:\n\nАбдуллаев Бахром Исмоилович | – | Фан, таълим ва соғлиқни сақлаш масалалари қўмитаси раиси;\n\nАтаниязова Орал Аминовна | – | Фан, таълим ва соғлиқни сақлаш масалалари қўмитаси раиси ўринбосари;\n\nБекатова Зумрад Рахимбаевна | – | Суд-ҳуқуқ масалалари ва коррупцияга қарши курашиш қўмитасида доимий асосда ишловчи сенатор."
+    ],
+    [
+     "QARORLAR-b882d75c/П.4#1",
+     "4. Мазкур Қарор Ўзбекистон Республикаси Олий Мажлисининг Қонунчилик палатасига юборилсин."
+    ],
+    [
+     "QARORLAR-b882d75c/П.5#1",
+     "5. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради.\n\nЎзбекистон Республикаси Олий Мажлиси Сенатининг Раиси"
+    ]
+   ]
+  },
+  {
+   "doc_id": "QARORLAR-42a342fd",
+   "label": "substantive",
+   "why": "cmp-056: Cabinet of Ministers 2-month alignment task + committee control",
+   "lang": [
+    "uz-Cyrl"
+   ],
+   "chunks": [
+    [
+     "QARORLAR-42a342fd/ПРЕАМБ.1#1",
+     "“Кам таъминланган шахсларга давлат ҳисобидан юридик ёрдам кўрсатиш тизими янада такомиллаштирилиши муносабати билан Ўзбекистон Республикасининг айрим қонун ҳужжатларига қўшимча ва ўзгартиришлар киритиш тўғрисида”ги\n\nЎзбекистон Республикаси Қонуни ҳақида\n\nЎзбекистон Республикаси Олий Мажлисининг Қонунчилик палатаси томонидан 2025 йил 5 август куни қабул қилинган “Кам таъминланган шахсларга давлат ҳисобидан юридик ёрдам кўрсатиш тизими янада такомиллаштирилиши муносабати билан Ўзбекистон Республикасининг айрим қонун ҳужжатларига қўшимча ва ўзгартиришлар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонунини кўриб чиқиб, Ўзбекистон Республикаси Конституциясининг 93-моддасига мувофиқ Ўзбекистон Республикаси Олий Мажлисининг Сенати\n\nҚ А Р О Р Қ И Л А Д И :"
+    ],
+    [
+     "QARORLAR-42a342fd/П.1#1",
+     "1. “Кам таъминланган шахсларга давлат ҳисобидан юридик ёрдам кўрсатиш тизими янада такомиллаштирилиши муносабати билан Ўзбекистон Республикасининг айрим қонун ҳужжатларига қўшимча ва ўзгартиришлар киритиш тўғрисида”ги Ўзбекистон Республикаси Қонуни маъқуллансин."
+    ],
+    [
+     "QARORLAR-42a342fd/П.2#1",
+     "2. Ўзбекистон Республикаси Вазирлар Маҳкамаси ушбу Қонун расмий эълон қилинган кундан эътиборан икки ой муддатда:\n\nҳукумат қарорларининг ушбу Қонунга мувофиқлаштирилишини;\n\nреспублика ижро этувчи ҳокимият органлари ушбу Қонунга мувофиқ ўз норматив-ҳуқуқий ҳужжатларини қайта кўриб чиқишлари ва бекор қилишларини таъминласин;\n\nамалга оширилган ишлар тўғрисида Ўзбекистон Республикаси Олий Мажлисининг Сенатига ахборот киритсин."
+    ],
+    [
+     "QARORLAR-42a342fd/П.3#1",
+     "3. Ўзбекистон Республикаси Олий Мажлиси Сенатининг Суд-ҳуқуқ масалалари ва коррупцияга қарши курашиш қўмитаси мазкур Қарор ижроси бўйича Ўзбекистон Республикаси Вазирлар Маҳкамасининг ахборотини кўриб чиқиб, натижалари юзасидан икки ҳафта муддатда Ўзбекистон Республикаси Олий Мажлиси Сенатининг Кенгашига ахборот киритсин."
+    ],
+    [
+     "QARORLAR-42a342fd/П.4#1",
+     "4. Ушбу Қарор қабул қилинган кундан эътиборан кучга киради."
+    ],
+    [
+     "QARORLAR-42a342fd/РЕКВ.1#1",
+     "Ўзбекистон Республикаси Олий Мажлиси Сенатининг Раиси | Т. Нарбаева"
+    ]
+   ]
+  },
+  {
+   "doc_id": "XULOSALAR-7f847bc1",
+   "label": "substantive",
+   "why": "cmp-001 (uz-Latn): committee decision with its conclusion annex (body blocks БЛ.1-4) and a plenary speaker",
+   "lang": [
+    "uz-Latn"
+   ],
+   "chunks": [
+    [
+     "XULOSALAR-7f847bc1/ПРЕАМБ.1#1",
+     "Loyiha\n\nOʼzbekiston Respublikasi Oliy Majlisi Senatining Xalqaro munosabatlar, tashqi iqtisodiy aloqalar, xorijiy investitsiyalar va turizm masalalari qoʼmitasining\n\nQARORI\n\n2025-yil ___-iyul\n\n________-sonli\n\nToshkent sh.\n\n“Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonuni toʼgʼrisida\n\n“Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonunini senatorlar, xalq deputatlari mahalliy Kengashlarining doimiy komissiyalari aʼzolari hamda masʼul vazirlik va idoralar vakillari ishtirokida muhokama qilib, Oʼzbekiston Respublikasi Oliy Majlisi Senatining Xalqaro munosabatlar, tashqi iqtisodiy aloqalar, xorijiy investitsiyalar va turizm masalalari qoʼmitasi\n\nQ A R O R Q I L A D I:"
+    ],
+    [
+     "XULOSALAR-7f847bc1/П.1#1",
+     "1. “Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonuni yuzasidan Xalqaro munosabatlar, tashqi iqtisodiy aloqalar, xorijiy investitsiyalar va turizm masalalari qoʼmitasining xulosasi ilovaga muvofiq maʼqullansin."
+    ],
+    [
+     "XULOSALAR-7f847bc1/П.2#1",
+     "2. “Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonunini Oʼzbekiston Respublikasi Oliy Majlisi Senatining navbatdagi yalpi majlisining kun tartibiga kiritish haqida Oʼzbekiston Respublikasi Oliy Majlisi Senatining Kengashiga taklif kiritilsin."
+    ],
+    [
+     "XULOSALAR-7f847bc1/П.3#1",
+     "3. Ushbu masala boʼyicha Oʼzbekiston Respublikasi Oliy Majlisi Senatining navbatdagi yalpi majlisida maʼruza bilan soʼzga chiqish Qoʼmita raisi oʼrinbosari O. Mamatkarimov zimmasiga yuklatilsin."
+    ],
+    [
+     "XULOSALAR-7f847bc1/РЕКВ.1#1",
+     "Qoʼmita raisi"
+    ],
+    [
+     "XULOSALAR-7f847bc1/ЗАГ.1#1",
+     "Xalqaro munosabatlar, tashqi iqtisodiy aloqalar, xorijiy investitsiyalar va turizm masalalari qoʼmitasining 2025-yil ...-iyuldagi ....-sonli qaroriga ilova\n\n“Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonuni yuzasidan\n\nQ Oʼ M I T A X U L O S A S I"
+    ],
+    [
+     "XULOSALAR-7f847bc1/БЛ.1#1",
+     "Oʼzbekiston Respublikasi Oliy Majlisining Qonunchilik palatasi tomonidan 2025-yil 17-iyunda qabul qilingan “Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonuni (bundan buyon matnda Qonun deb yuritiladi) koʼrib chiqish uchun Oʼzbekiston Respublikasi Oliy Majlisining Senatiga kelib tushdi.\n\nQoʼmita ishchi guruhi tomonidan Qonun va unga oid hujjatlarni koʼrib chiqish jarayonida quyidagilar qayd etildi.\n\nUshbu Qonun Oʼzbekiston Respublikasi Prezidentining 2024-yil 4-apreldagi “Mehnat migratsiyasi jarayonlarini takomillashtirish hamda xorijda vaqtincha mehnat faoliyatini amalga oshirayotgan shaxslarni qoʼllab-quvvatlashga doir qoʼshimcha chora-tadbirlar toʼgʼrisida”gi PF–59-sonli, 2024-yil 17-oktabrdagi “Migratsiya jarayonlarini boshqarish tizimini isloh qilish boʼyicha birinchi navbatdagi chora-tadbirlar toʼgʼrisida”gi PF–162-sonli farmonlari, 2024-yil 17-oktabrdagi “Xorijda mehnat faoliyatini amalga oshirish jarayonlarini tartibga solish boʼyicha qoʼshimcha chora-tadbirlar toʼgʼrisida”gi PQ–367-sonli Qarori hamda Oʼzbekiston Respublikasi Prezidenti Administratsiyasining 2025-yil 28-fevraldagi XDFU 03-RA 1-2948/3-sonli topshirigʼi ijrosini taʼminlash maqsadida Vazirlar Mahkamasi huzuridagi Migratsiya agentligi tomonidan ishlab chiqilgan."
+    ],
+    [
+     "XULOSALAR-7f847bc1/БЛ.2#1",
+     "Qonun 7 ta moddadan iborat boʼlib, Oʼzbekiston Respublikasining Maʼmuriy javobgarlik toʼgʼrisidagi kodeksiga, Oʼzbekiston Respublikasining Mehnat kodeksiga, “Xususiy bandlik agentliklari toʼgʼrisida”gi hamda “Aholi bandligi toʼgʼrisida”gi qonunlariga tegishincha Oʼzbekiston Respublikasi Vazirlar Mahkamasi huzuridagi Migratsiya agentligining vakolatlarini aniqlashtirishga, xususiy bandlik agentliklarining huquqlari va majburiyatlarini kengaytirishga, shuningdek ish vaqtidan tashqari ishning davomiyligini belgilashga hamda ish vaqtidan tashqari ish uchun haq toʼlash tizimini takomillashtirishga qaratilgan oʼzgartirish va qoʼshimchalar kiritishni nazarda tutadi.\n\nXususan, Qonun bilan:\n\n- Migratsiya agentligiga xususiy bandlik agentliklari toʼgʼrisidagi qonunchilikni buzganlik uchun maʼmuriy taʼsir choralarini qoʼllash vakolati berilmoqda;\n\n- Vazirlar Mahkamasi huzuridagi Migratsiya agentligi Oʼzbekiston Respublikasidan tashqarida ish qidirayotgan shaxslarni ishga joylashtirish boʼyicha faoliyatni litsenziyalash, litsenziya talablari va shartlariga rioya etilishini nazorat qilish borasida vakolatli organ etib belgilanmoqda;\n\n- xususiy bandlik agentliklari tomonidan litsenziya olish uchun zaxira qilinishi lozim boʼlgan mablagʼlar miqdori bazaviy hisoblash miqdorining sakkiz ming besh yuz baravaridan bazaviy hisoblash miqdorining toʼrt ming baravarigacha kamaytirilmoqda. Shuningdek ularga xorijda vaqtincha mehnat faoliyatini amalga oshirish istagida boʼlgan fuqarolarni kasb-hunarga va chet tillariga oʼqitish boʼyicha oʼquv kurslarini tashkil etish hamda ushbu jarayonga hamkor xorijiy ish beruvchilarni jalb qilish huquqini berish nazarda tutilmoqda;"
+    ],
+    [
+     "XULOSALAR-7f847bc1/БЛ.3#1",
+     "- Migratsiya jamgʼarmasi mablagʼlaridan foydalanishning asosiy yoʼnalishlari takomillashtirilmoqda;\n\n- firibgarlik, odam savdosi, terrorizm, ekstremizm bilan bogʼliq jinoyatlarni sodir etganlik uchun sudlanganligi tugallanmagan yoki olib tashlanmagan shaxslar tashkil etgan yoki rahbari boʼlgan xususiy bandlik agentliklariga litsenziya berilishi, shuningdek, xususiy bandlik agentliklari tomonidan bunday jinoyatlarni sodir etganlik uchun sudlanganlik holati tugallanmagan yoki sudlanganligi olib tashlanmagan shaxslar bilan mehnat va fuqarolik-huquqiy shartnomalar tuzilishi taqiqlanmoqda;\n\n- xususiy bandlik agentliklari tomonidan xizmat koʼrsatish shartnomalari boʼyicha oʼz majburiyatlarini bajarmaganlik yoki lozim darajada bajarmaganlik bilan bogʼliq tavakkalchiliklarni sugʼurtalash tartibini joriy etish, sugʼurta mukofoti miqdorini xizmat koʼrsatish shartnomasi summasiga hamda fuqaroning Oʼzbekistonga qaytish xarajatlariga mutanosib miqdorda belgilash hamda xususiy bandlik agentliklari va xorijiy ish beruvchilarning fuqarolar oldida solidar javobgarligini belgilovchi tartibni joriy etish nazarda tutilmoqda;\n\n- Vazirlar Mahkamasi huzuridagi Migratsiya agentligi zimmasiga xususiy bandlik agentliklari faoliyatini baholash mezonlarini belgilash va ularning reytingini tuzish vazifasi yuklatilmoqda.\n\nShuningdek, Qonunda ish vaqtidan tashqari ishning bir kundagi birinchi ikki soati uchun kamida bir yarim hissa miqdorida, ikki soatdan ortiq qismi uchun kamida ikki hissa miqdorida (mehnat sharoitlari noqulay boʼlgan ishlarda – har bir soati uchun kamida ikki hissa miqdorida) haq toʼlanishi belgilanmoqda."
+    ],
+    [
+     "XULOSALAR-7f847bc1/БЛ.4#1",
+     "Qonun Oʼzbekiston Respublikasi Konstitutsiyasi, “Oʼzbekiston Respublikasining xalqaro shartnomalari toʼgʼrisida”gi Qonuni va boshqa qonunlariga, qonunchilik texnikasi qoidalariga mos keladi.\n\nYuqorida bayon etilganlarga asoslanib, “Oʼzbekiston Respublikasi Oliy Majlisining Senati toʼgʼrisida”gi Oʼzbekiston Respublikasi Konstitutsiyaviy Qonuni 23-moddasining ikkinchi qismiga muvofiq, Oʼzbekiston Respublikasi Oliy Majlisi Senatining Xalqaro munosabatlar, tashqi iqtisodiy aloqalar, xorijiy investitsiyalar va turizm masalalari qoʼmitasi\n\nX U L O SA Q I L A D I :\n\n“Oʼzbekiston Respublikasining ayrim qonun hujjatlariga oʼzgartirish va qoʼshimchalar kiritish toʼgʼrisida”gi Oʼzbekiston Respublikasi Qonuni maʼqullash toʼgʼrisidagi masalani koʼrib chiqish uchun Oʼzbekiston Respublikasi Oliy Majlisi Senatining navbatdagi yalpi majlisi kun tartibiga kiritish haqidagi tavsiya Oʼzbekiston Respublikasi Oliy Majlisi Senatining Kengashiga kiritilsin."
+    ],
+    [
+     "XULOSALAR-7f847bc1/РЕКВ.2#1",
+     "Qoʼmita raisi"
+    ]
+   ]
+  }
+ ]
+}

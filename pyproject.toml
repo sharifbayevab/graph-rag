@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graphrag-rl"
+version = "0.1.0"
+description = "GraphRAG-RL: RL-controlled context selection over a legal knowledge graph"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "numpy>=2.1",
+    "docx2txt==0.9",
+    "pypdf==6.2.0",
+    "pymorphy3>=2.0",
+    "pymorphy3-dicts-ru>=2.4",
+    "torch>=2.6",
+    "torch_geometric==2.8.0.post1",
+    "transformers>=4.57",
+    "sentence-transformers>=5.1",
+    "psycopg2-binary==2.9.10",
+    "qdrant-client==1.18.0",
+    "neo4j>=5.28",
+    "opendataloader-pdf==2.5.11",
+    "openai==3.19.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3"]
+train = ["matplotlib>=3.9"]
+
+[tool.setuptools.packages.find]
+include = ["graphrag*", "grl*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "integration: needs the docker services (postgres, qdrant, neo4j)",
+    "model: loads the encoder / tokenizer from HuggingFace",
+    "corpus: reads the real corpus in ../docs",
+    "cuda: needs a CUDA device (DGX Spark)",
+    "slow: real pinned-graph data + vectors (run under spark.py verify)",
+]
+# one -m only: a command-line -m REPLACES this one (it does not combine), so never add `-m "not slow"` by hand --
+# it would re-enable integration/model/corpus/cuda. slow runs on Spark: spark.py verify passes its own -m.
+addopts = "-m 'not integration and not model and not corpus and not cuda and not slow'"

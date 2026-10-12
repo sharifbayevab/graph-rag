@@ -1,0 +1,43 @@
+corpus_root: ../docs
+sections: [BOSHQA, QARORLAR, QONUNLAR, STENOGRAMMA, XULOSALAR]
+extensions: [.docx, .doc, .pdf, .md, .txt]
+exclude_dirs: [_doc_originals]
+records_dir: data/records
+tokenizer: intfloat/multilingual-e5-base   # chunk-size counter; = the bge-m3 tokenizer (XLM-R, identical 250,002 vocab: 0 of 16,643 chunks differ, M2 Task 1), kept so chunk ids stay put
+tokenizer_revision: d128750597153bb5987e10b1c3493a34e5a4502a   # HF commit of the chunk-size tokenizer (M3 Task 1, m5)
+max_tokens: 384
+embed_field: index_text         # chunk field embedded AND tokenized for BM25 (breadcrumb + text_norm)
+lexicon:
+  path: data/lexicon/uz_vocab.json
+  min_freq: 2
+bm25:
+  k1: 1.2
+  b: 0.75
+chunker:
+  attach_min_tokens: 48         # stenogram: a whole turn below this attaches to a neighbour turn
+pdf:
+  engine: opendataloader        # opendataloader | pypdf
+  table_method: cluster         # border + cluster: also finds the borderless table on №12 p.28 (default: border-only)
+  space_ratio: 0.08             # ODL space insertion (gap > ratio*font size); 0.17 glues words in №13
+  vision:
+    enabled: true
+    model: gpt-4.1
+    api: false                  # false: cached answers only, a miss fails the build; GRL_VISION_API=1 allows calls
+    min_side_px: 120
+    max_repeat_pages: 5         # an identical image on >= this many pages is decoration
+    max_calls_per_run: 600      # budget guard: VisionBudgetExceeded beyond this
+    workers: 8                  # concurrent cache prefetch (answers are order-independent)
+    pages: true                 # page-level vision for pages with >= page_min_numbers unlabelled numbers
+    page_min_numbers: 3
+    page_dpi: 150
+    cache_dir: cache/vision     # tracked in git: rebuilds are offline and identical on any machine
+agenda:                         # verified gpt-4.1 agenda segmentation of stenograms (graphrag/data/agenda.py)
+  enabled: true
+  model: gpt-4.1
+  api: false                    # false: cached answers only (regex fallback on a miss); GRL_AGENDA_API=1 allows calls
+  max_calls_per_run: 60         # hard cap: AgendaBudgetExceeded beyond this
+  cache_dir: cache/agenda       # tracked in git: rebuilds are offline and identical on any machine
+start:                      # V0 (roadmap §3 item 7); τ calibrated on the dataset TRAIN split in M3 Task 19
+  tau_lex: 0.5
+  tau_sem: 0.6
+  cap: 64

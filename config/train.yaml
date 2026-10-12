@@ -1,0 +1,328 @@
+# M3: environment, reward, gold, synthetic dataset (IMPLEMENTATION.md §5, §7, §8.1, §9.1; roadmap §3 items 7–10,
+# §5 "M3–M7 key parameters"). Not a graph-version input (build.VERSION_CONFIG_SKIP). M4/M5 add model / sft / grpo.
+env:
+  graph_version: "40d525a97cb9"
+  T_max: 10
+  K_max: 24                 # ⟦П6·D5⟧
+  L_max: 8000               # ⟦П6·D5⟧ tokens (Chunk.tokens)
+  k_grid: [3, 5, 10]
+  m_grid: [1, 3, 5]
+  lambda_red: 0.5
+  per_vertex_chunks: 3      # resolved ambiguity (Task 6): fragments one selected vertex adds at most
+  score_decimals: 6
+  top: 200                  # U9
+  memo_max: 200000          # Task 13: per-query candidate / mask memo entries
+reward:
+  weights: {alpha: 0.5, beta: 0.2, gamma: 0.2, delta: 0.1}
+  chunks_beta: 1             # M5 grl.train.fbeta: R_chunks = F-beta (1 = the spec F1; 2 = F2, recall-favouring)
+dynamic_k:                  # M5 adaptive variants: search thresholds p on per-query min-max normalised scores
+  normalise: true           # false = raw BM25 / cosine (baselines always report both: rel:* and rel_raw:*)
+  norm_top_n: 50            # min-max window: the channel's top-N ranked fragments
+  fuse_w: 0.7               # fused_adaptive: dense weight w of the lexical slots' BM25 + dense convex fusion
+gold:                       # Q-real: the separate real-question TEST set (decision П2)
+  file: data/gold/qreal.jsonl
+  use_support: true         # ⟦П6·D6⟧
+split:                      # ⟦П3⟧ documents (groups) -> train / val / test, before any generation
+  seed: 20260928
+  ratios: {train: 0.70, val: 0.15, test: 0.15}
+  links:                    # M3-R7: curated same-act families the automatic rules miss (hub / generic-titled); one split each
+    - docs: [QONUNLAR-00207a4c, QARORLAR-c820a7ab, XULOSALAR-fa8ed64a]
+      why: "«Давлат божи тўғрисида»ги Қонунга қўшимча (LC 2022-10-25; 50 % duty on court claims about public services): law, Senate decision, Budget committee conclusion"
+    - docs: [QONUNLAR-44d353fc, XULOSALAR-5071eecf]
+      why: "NGO / sponsorship omnibus law (LC 2025-04-15, 13 articles; MJtK, Soliq, NNT, Jamoat fondlari, Homiylik, Ijtimoiy sheriklik ...): law + Youth committee conclusion ('13 ta moddadan')"
+    - docs: [QONUNLAR-05d09e0e, QONUNLAR-545c1718, QONUNLAR-b6eaa3d8]
+      why: "crime-prevention omnibus law (LC 2025-04-15, 6 articles: JK, JPK, JIK, Huquqbuzarliklar profilaktikasi; Interior Ministry): law, Defence & Security committee conclusion ('6 та моддадан'), Senate decision assigning that committee"
+dataset:                    # decision П1 (1000 single-turn §8.1 pairs)
+  size: 1000
+  seed: 20260928
+  # M3-R20 (user 2026-09-29): 900 single / 100 multi (bridge + aggregation walks); overshoot = target_margin / the
+  # M3-R19 projected yield (single .30, multi .14) -- re-set from the re-pilot; a cell short only of it is reported
+  overshoot: {single: 6.67, multi: 8.2}   # M3-R29: single pool >= 1.5 x need (1000) at 25 % end-to-end yield
+  hops: {single: 0.90, multi: 0.10}                                                      # ⟦П4⟧ revised M3-R20
+  langs: {uz-Cyrl: 0.45, uz-Latn: 0.25, ru: 0.30}                                        # ⟦П4⟧
+  single_sections: {QONUNLAR: 0.30, QARORLAR: 0.20, STENOGRAMMA: 0.25, XULOSALAR: 0.15, BOSHQA: 0.10}   # ⟦П4⟧
+  min_tokens: 30            # a seed fragment has content
+  # M3-R10: graph walk + atomic facts
+  walk_edges: [CONTAINS, REFERS_TO, AMENDS, REPEALS, DEFINES]   # verified types only; no REGULATES / RELATED
+  max_hops: 3
+  max_branch: 8              # neighbours tried per vertex in a walk (sha256 order): bounds hubs
+  facts_block: 8             # ds_facts cache unit: 8 consecutive fragments of one document per call
+  max_facts_per_chunk: 6
+  gen_batch: 6               # seeds per ds_generate call (M3-R20; was 3)
+  bridge_batch: 3            # M3-R21: anchors per ds_bridge call (each with <= 8 neighbour texts)
+  quality_batch: 6           # M3-R22: pairs per ds_quality call
+  quality_calibration:       # M3-R22 (3): the 17 re-pilot pairs vs the strict reader; target exact >= 15/17, 0 BAD accepted
+    pairs: data/dataset/pilot2/verified.jsonl
+    labels: ../.superpowers/sdd/2026-09-28-m3-env-reward/repilot-reading.md
+    min_exact: 15
+  pilot3: {bridge_anchors: 30, single_per_lang: 12}   # M3-R21 pilot 3 (live, once); dir data/dataset/pilot3
+  legal_glossary:            # M3-R22 (1): standard Russian renderings (strict re-pilot reading, defect 6)
+    тафтиш инстанцияси: ревизионная инстанция
+    назорат инстанцияси: надзорная инстанция
+    Солиқ қўмитаси: Налоговый комитет
+    баённома: протокол
+    Қонунчилик палатаси: Законодательная палата
+    Олий Мажлис Сенати: Сенат Олий Мажлиса
+    Сенатнинг ялпи мажлиси: пленарное заседание Сената
+    Вазирлар Маҳкамаси: Кабинет Министров
+    Маъмурий жавобгарлик тўғрисидаги кодекс: Кодекс об административной ответственности
+    Божхона кодекси: Таможенный кодекс
+    Солиқ кодекси: Налоговый кодекс
+    Жиноят кодекси: Уголовный кодекс
+    Фуқаролик процессуал кодекси: Гражданский процессуальный кодекс
+    базавий ҳисоблаш миқдори: базовая расчётная величина (БРВ)
+    маҳалла: махалля
+    ҳоким: хоким
+    қўмита хулосаси: заключение комитета
+    Сенат қарори: постановление Сената
+    парламент сўрови: парламентский запрос
+    сенатор сўрови: сенаторский запрос
+    депутат сўрови: депутатский запрос
+    давлат божи: государственная пошлина
+  opus:                      # M3-R23 (user 2026-09-29): Opus agents generate; gpt-4.1 verifies; an independent Opus reader reads every pair
+    dir: data/dataset/opus           # packets/ gen/ review/ + candidates_raw / verified / reviewed / candidates / pairs
+    pilot_dir: data/dataset/opus/pilot
+    agent_model: claude-opus-5-5     # provenance generate.model of the generator agents
+    packet_size: 40                  # single seeds per generator packet (split- and pattern-pure)
+    multi_packet_size: 30            # anchors per multi packet
+    multi_overshoot: 3.0             # anchors per final multi pair per split (the ds_bridge pilot measured no yield yet)
+    review_packet_size: 40           # pairs per reviewer packet
+    generator: {file: config/dataset_opus_generator.md, version: 8,     # v2: M3-R25 multi self-test, no restating / padding, values <= 300; v3: M3-R29 near-copy, act identity, session date / speaker, wording, model-neutral; v4: M3-R31 multi-day ranges, speaker only from meta, translated near-copy examples; v5: ru purity, amended provision, sitting dates / discussed law, 3 wave-1 examples; v6: graph meta discussed_act / amended_act for naming; v7: speaker roles / stance only from text or meta; v8: non-contiguous sitting days, no relative years
+                digest: 2b5bcb2a2ea1b769a5e560f15456ab6db75d9ca4b8fab957859fe45b8bc6d651}
+    generator_history:               # every digest a committed generator output may have been written under (gen/<id>.meta.json)
+      1: f2130e2054bdbdbae10d9778923d7ebac09c4017e6f280994b730f30fd44c7ee
+      2: 8ea82876ce45c392093a3d7a9889defb10b557caf32745c961b8a78bb0167f40
+      3: f6e2e628242a42c293cb61bd33699ffc4146f18adaa99217f3cbb64790fd251a
+      4: 066ca96b6520da9f4873a63cbdb9ce6ffd11f939829a3b2216b5722a43a06ed9
+      5: 99b6b96bff7b8ceb2e30308e44966c2114fccdb82dab1c85badf754d70ca4c6b
+      6: 2cf0989e68104487fc078e0315bc2155a2c12781d82bad94efd3d0ff1f5e0e5a
+      7: 0151ef1881333b78a6a833e2246f61a9b0f275f46e62c1decb76cc17af6c97df
+      8: 2b5bcb2a2ea1b769a5e560f15456ab6db75d9ca4b8fab957859fe45b8bc6d651
+    dup_min_chars: 40                # M3-R25: a fragment text (wsn) this long that recurs in another document is duplicate content
+    reader: {file: config/dataset_reader_rubric.md, version: 3,     # v2: M3-R31 packet meta (speaker, session dates, act, doc type) supports names / dates; file renamed (no model name); v3: discussed_act / amended_act meta supports
+             digest: d6a20b19b689c1e2c6b41d5b592c7a8b932fa29d0bbefe6d919728efd2587be2}
+    reader_history:                  # rubric digests a committed reviewer packet may carry
+      1: 3aa2cd214ed13e05840c85c2ff2144418ae7a3702d41a83fce9c50ec1605a7b5
+      2: 7e57f0d724b23f031ab110d9a88137cb248e09868c61d943c66367499e939a80
+      3: d6a20b19b689c1e2c6b41d5b592c7a8b932fa29d0bbefe6d919728efd2587be2
+    pilot: {split: train, single: 40, multi: 30}   # pilot-opus: 1 single packet (langs balanced) + 1 multi packet (bridge sources balanced)
+    reader_gate: {min_good: 0.90, min_wilson: 0.75}
+    mini_pilot: {split: train, single: 40}          # M3-R29: fresh train singles (langs balanced) under instructions v3
+    multi_all:                       # M3-R29: multi over every usable anchor (all splits), split-pure packets
+      sources: [refers_to, amends, concept]   # graph links that can carry a genuine 2-hop question ("related" = topical only; pilot 0/7)
+      per_doc: 3                     # anchors per document (hash order, direct links first)
+      packet_size: 30
+    repair: {file: config/dataset_repair.md, version: 1,        # M3-R32: one-shot repair of BORDERLINE pairs
+             digest: 0c7505095537d2c6fd5387583f8a85e76909c9bc89317015dc36f0b583b8315e}
+    repair_packet_size: 25
+    second_reader_frac: 0.2          # M3-R29: Opus second reader sample (review-packets --sample-frac)   # M3-R22 (4) pilot gate on the independent reader
+  role_words:                # speaker titles / roles: allowed in Q/A only if the fragment text or meta has them (instructions v7)
+    [senator, deputat, rais, vazir, hokim, xokim, direktor, ministr, predsedatel, zamestitel, prokuror, ombudsman,
+     spiker, mudir, boshliq, nachalnik, rektor]
+  name_gazetteer:            # proper-noun matching (foreign_names): Russian stem -> Uzbek Latin forms of regions and cities
+    ташкент: [toshkent]
+    андижан: [andijon]
+    бухар: [buxoro]
+    джизак: [jizzax]
+    кашкадар: [qashqadaryo]
+    навои: [navoiy]
+    наманган: [namangan]
+    самарканд: [samarqand]
+    сурхандар: [surxondaryo]
+    сырдар: [sirdaryo]
+    ферган: [fargʻona]
+    хорезм: [xorazm]
+    каракалпак: [qoraqalpogʻiston]
+    нукус: [nukus]
+    ургенч: [urganch]
+    карши: [qarshi]
+    термез: [termiz]
+    гулистан: [guliston]
+    коканд: [qoʻqon]
+    маргилан: [margʻilon]
+    чирчик: [chirchiq]
+    ангрен: [angren]
+    алмалык: [olmaliq]
+    шахрисабз: [shahrisabz]
+    зарафшан: [zarafshon]
+  verify_agree_per_call: 10  # M3-R20: agreement-pass items per ds_verify call (judge-checked values)
+  pilot_dir: data/dataset/pilot2   # M3-R20 re-pilot: its seeds / calls are forced into the full run (pilot-first)
+  repilot: {single_old: 24, single_new: 24, bridge: 12, aggregation: 18}   # M3-R20 re-pilot, cached fact blocks only
+  verify_batch: 2            # ds_verify plant group: one plant per chosen group of 2 pairs (share plant_share)
+  verify_views_per_call: 5   # M3-R17: judge views per call; never two views of one question, never a plant beside its base
+  verify_min_kind_n: 10      # M3-R17: plants per judge-level kind (question_swap, padded_single, neighbor_swap) to gate
+  verify_quote_cap: [300, 0.5, 200]  # judge quote counts if <= 300 chars and <= 50 % of its fragment (<= 200 chars always; M3-R25 B, was 80; typed values exempt)
+  max_seeds_per_doc_cell: 6  # seeds per document per (split × pattern × language) cell (legacy; replaced by seed_doc_cap)
+  seed_doc_cap: {floor: 10, share: 0.2}   # M3-R21: per document per cell max(floor, ceil(share x its fragments)); M3-R29: 3 / 0.02 -> 10 / 0.2 (single pool >= 1.5 x need at 50 % yield; 25 % blocked by section quotas)
+  max_seeds_per_chunk: 3     # M3-R14 (3): a fragment is in at most 3 seeds
+  # M3-R15 transfer (amends -> refers_internal) is obsolete under M3-R20 (one multi pattern)
+  hub:                       # M3-R14 (1): a walk never bridges through a hub act-level vertex (document / EXT act root)
+    max_referrer_docs: 6     # Task 10 hub rule: > 6 other documents refer to the act (or its elements)
+    top_degree_share: 0.01   # ... or its walk-edge degree is in the top 1 % of act-level vertices
+  max_per_doc_cell: 3        # M3-R3 п. 7: final pairs per document per cell
+  max_template_share: 0.08   # M3-R3 п. 7: one question opening (first two content words) per cell
+  dedup_cos_max: 0.90        # M3-R3 п. 7
+  ngram_jaccard_max: 0.50    # M3-R3 п. 7: word 4-gram Jaccard of two questions
+  # ⟦П6·D8⟧ leakage guard: graphrag.dataset.seeds.qreal_exclusion (gold ∪ support ∪ alt ∪ context ∪ linked-doc same path), always on
+  qreal_question_cos_max: 0.90   # ⟦П6·D8⟧
+  max_copy_words: 6         # a question copies at most 6 consecutive words of a fragment (act-title words and numbers exempt)
+  max_lexical_overlap: 0.60 # paraphrase rule: share of the question's content lemmas found in the fragments (titles, numbers exempt)
+  copy_calibration:         # M3-R21 (2): per language family, threshold = P90 of the 340 Q-real questions (Cyrl + Latn forms)
+    source: data/gold/qreal.jsonl   # vs their gold fragments (core ∪ support); scripts/build_dataset.py calibrate-copy
+    quantile: 0.90            # ru: Q-real has no Russian question -> no family entry -> legacy max_copy_words / max_lexical_overlap
+    families:
+      uz:
+        n: 680
+        max_copy_words: 7
+        max_lexical_overlap: 0.8462
+        run_hist: {"0": 8, "1": 31, "2": 129, "3": 166, "4": 109, "5": 104, "6": 54, "7": 38, "8": 21, "9": 10, "10": 5, "11": 3, "13": 2}
+        overlap_quantiles: {p10: 0.25, p25: 0.5, p50: 0.6667, p75: 0.7692, p90: 0.8462, p95: 0.8889}
+  near_copy:                # M3-R29: blanked-sentence near-copy gate (generate.near_copy_ratio >= max_ratio rejects); P90 of Q-real
+    source: data/gold/qreal.jsonl   # questions (Cyrl + Latn) vs their gold fragments' sentences; scripts/build_dataset.py calibrate-near-copy
+    quantile: 0.90
+    n: 680
+    max_ratio: 0.7222
+  plant_share: 0.15          # main run: one plant per chosen group of verify_batch pairs (M3-R18 (a))
+  plant_target_pilot: 10     # M3-R18 (a) / M3-R20 re-pilot: pilot plants per judge kind (= verify_min_kind_n: the gate is measurable)
+  min_sensitivity_kind: 0.90 # M3-R3 п. 8: every plant kind
+  manual_sample: 100         # M3-R3 п. 9: independent reviewer, stratified over all cells
+  manual_min_share: 0.95
+  manual_min_wilson: 0.90
+  pilot_per_cell: 8         # Task 17: seeds per (pattern × language) cell -> 4 × 3 × 8 = 96
+  target_margin: 1.15       # full-run overshoot = target_margin / pilot yield of the pattern
+  max_threshold_loss: 0.20  # П5 gate: 0.55 may reject at most 20 % of STOP ∧ full-recall trajectories per pattern
+  traj_min_reward: 0.55     # ⟦П5⟧ plus: all C_ref reached, ends with STOP
+dataset_llm:                # decision П2: own passes, own ledger, cumulative cap 2500; gate GRL_DATASET_API=1
+  model: gpt-4.1
+  cache_dir: cache/dataset
+  max_calls_total: 2500       # M3-R3 п. 14: the dataset passes enforce it over the whole ledger (graphrag.dataset.facts.guard_total)
+  passes:                    # M3-R10: three passes; the caps sum to the cumulative 2500 (Task 18 re-sets them from the pilot)
+    ds_facts: {prompt_version: 2, max_calls: 900}      # v2: M3-R16 (Task 15 fix)
+    ds_generate: {prompt_version: 5, max_calls: 600}   # v2: M3-R16 (Task 15 fix); v3: M3-R18 amends line; v4: M3-R20; v5: M3-R22 reading fixes + GLOSSARY
+    ds_verify: {prompt_version: 6, max_calls: 1000}    # v2: M3-R17 one view per question per call; v3: M3-R18 quote length; v4: + M3-R20 agreement pass; v5: M3-R28 answer + complete (evidence-based ablation); v6: M3-R30 one verbatim quote per value, <= 300 chars, fragment script, no "…"
+    ds_bridge: {prompt_version: 1, max_calls: 150}     # M3-R21 agentic neighbour selector (multi-hop); inside the 2500 total (guard_total)
+    ds_quality: {prompt_version: 2, max_calls: 200}    # M3-R22 rubric quality judge (blind to the generator); v2: per-criterion checks, GOOD by code
+    # M3-R23: the Opus generator / reader are agents, not API passes (0 calls); only ds_verify spends (~700 calls)
+gold_llm:                   # ⟦П6·D6⟧ gate GRL_GOLD_API=1
+  model: gpt-4.1
+  cache_dir: cache/gold
+  max_calls_total: 360
+  passes:
+    gold_complete: {prompt_version: 1, max_calls: 360}
+hard_llm:                 # M7 ds_hard (spec §6): separate cache + ledger, cap 900; old dataset_llm (2500) untouched
+  model: gpt-4.1
+  cache_dir: cache/hard
+  max_calls_total: 900
+  passes:
+    ds_hard: {prompt_version: 1, max_calls: 900}
+oracle:
+  beam_width: 32             # M3-R6 (was 8); Task 17 pilot picks the smallest config with ≤ 2% loss vs w128
+  graph_share: 0.25         # ≥ ⌈share·w⌉ beam slots reserved for graph-action children
+  lookahead: true           # chunkless graph child scored by the best R one fragment-adding step further
+parallel:
+  workers: 8
+  start_method: spawn       # Task 13: fork is unsafe after torch + Accelerate on macOS; spawn + EnvData loaded once per worker
+random:
+  seeds: [0, 1, 2, 3]       # even: uniform over valid actions incl. STOP; odd: never STOP (stress limits)
+# ---------------------------------------------------------------------------------------------------------------
+# M4/M5 (docs/plans/2026-10-01-m4-m5-model-training.md): model §6, SFT §8.2, GRPO §8.3–8.6. train.yaml is outside
+# the graph version digest (build.VERSION_CONFIG_SKIP); a new config/*.yaml would move the pinned graph version.
+model:
+  in_dim: 1024              # bge-m3 (roadmap §5a): x of pyg.pt and e_q of the U9 rankings
+  hidden: 256               # §6.2: 8 heads × 32
+  heads: 8
+  layers: 3
+  edge_dim: 32              # U2: edge features in attention
+  dropout: 0.1
+  encoder: gat              # gat | mlp (§9.5 ablation "без GNN-кодировщика")
+  graph:
+    reverse_edges: true     # M2 R24: reverse of every directed type; RELATED is stored both ways already
+    drop_types: []          # ablation hook "no RELATED": [RELATED]
+    hub_cap: null           # ablation hook: max in-edges per (vertex, relation); null = all
+  state:
+    pool_hidden: 128        # §6.3: MLP 128 after mean pooling
+    cand_dim: 32            # per edge type candidate pool
+    preview: 3              # next lexical / vector fragments previewed
+    cand_top: 64            # graph candidates pooled per type (Δ_V order)
+  policy:
+    hidden: [512, 256]      # §6.4
+sft:                        # §8.2
+  loss: marginal            # ⟦D3⟧ marginal | uniform | hard
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  batch_queries: 16
+  max_epochs: 200
+  patience: 15              # epochs without val-loss improvement
+  min_delta: 1.0e-4
+  grad_clip: 1.0
+  seed: 20261001
+grpo:                       # §8.3–8.4
+  G_s: 4
+  lr: 3.0e-4
+  beta_kl: 0.01
+  batch_queries: 8
+  iterations: 2000
+  val_every: 25
+  patience: 8               # validations without improvement
+  temperature: 1.0
+  adv_eps: 1.0e-6
+  step_penalty: 0.0         # U11 λ_len (0 = the spec reward)
+  freeze_gnn: false         # ⟦D6⟧
+  grad_clip: 1.0
+  seed: 20261001
+run:                        # run directories are always explicit (--run)
+  keep_top: 3               # roadmap §6: at most top-3 checkpoints (+ last)
+  device: auto              # auto: cuda > mps > cpu
+  deterministic: strict     # strict | warn | off (§9.6)
+  vec_env: {workers: 8, start_method: spawn, timeout_s: 600}
+alarms:                     # §8.7
+  tmax_share: 0.5
+  op_collapse_share: 0.9
+  kl_max: 0.5
+  stop_share_min: 0.5
+m5_pilot:                   # ⟦D4⟧
+  source_dir: data/dataset/fable
+  out_root: data/m5/pilot
+  splits: [train, val]      # the test split never enters the snapshot
+  grpo_iterations: 200      # Task 13 Step 5 builds its --set grpo.iterations / grpo.val_every from these two
+  grpo_val_every: 20
+spark:                      # ⟦D7⟧ key NAMES in the main checkout's repo-root .env (values are never printed)
+  auth: password            # ⟦D7 b⟧ password (sshpass -e, SSHPASS env) | key (BatchMode, D7 a)
+  env_target: SHH
+  env_password: PASSWORD
+  remote_dir: abdurakhmon/grl/advanced-rag-v2   # relative to the remote home
+  torch_version: "2.14.0"
+  torch_index: https://download.pytorch.org/whl/cu130
+expert:                     # M5 pre-RL variant expert (grl.train.expert; train.py expert)
+  depth: 3                  # retrieval steps searched before STOP
+  max_states: 20000         # per-query cap of the exact search; beyond it the query switches to a beam (flagged)
+  struct_max_states: 1000000  # R38: the cap of variant struct (unpruned + limit finals, depth 5, K_max 5): the
+                            # smallest ladder rung (20k / 200k / 1M) with 0 of 40 pilot-5 train queries capped
+  struct_workers: 4         # R40: train.py expert --variant struct processes (9-14 KB / state; --workers overrides)
+  struct_max_rss_gb: 20     # R40/R42: per-query RSS GROWTH (current RSS − RSS at query start) guard; above it the
+                            # query continues as the flagged cap beam (capped_reason rss)
+  struct_rss_ceiling_gb: null   # R42: optional absolute process-RSS ceiling (GB; null = off) -> capped_reason
+                                # rss_ceiling
+  cap_beam: 256             # live states per depth after the cap
+rerank:                     # M5 RL reranker (variant "rerank", grl.model.rerank): pointer policy over the fused top-N
+  n: 20                     # candidates = first n fragments of fused_scores (dynamic_k.fuse_w / norm_top_n) fitting L_max
+  use_ce: false             # cross-encoder score as a per-candidate policy feature (needs ce_cache)
+  ce_cache: null            # scripts/ce_scores.py output .jsonl (its .meta.json beside it); also feeds the ce baselines
+  ce_model: BAAI/bge-reranker-v2-m3
+  ce_revision: 953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e   # pinned HF commit; ce_scores.py refuses any other
+  ce_text: text             # chunk field scored against the query text: text | text_norm | index_text
+  ce_max_length: 512
+  ce_batch: 32
+  ce_n: 30                  # candidates scored per query by ce_scores.py (>= n: n can grow without a rescore)
+  head: {cand_dim: 64, hidden: [256, 128]}   # RerankPolicy pointer / STOP MLPs (model.rerank_head)
+struct:                     # M7 Task 6c (variant "struct" only): --set struct.articles=true adds the STRUCT/<article> rows
+  articles: false           # (grl.env.struct_data, data/hard/struct_art_vecs.npz) to the `structure` candidates; false =
+                            # the pilot 7 / 8 env exactly; the expert labels record it (env_kw), the SFT gate compares
+  amend_op: false           # Task 6d-b: true adds the `amendments` operator m in {1,3,5} (34 actions / 9 types): the
+                            # AMENDS-source fragments of the roots of F u S u V0; false = the 31-action env exactly;
+                            # recorded in the label env_kw like articles; sft --init-from widens 28/31 -> 34
+rank:                       # M5 pilot 6 (variant "rank", grl.model.rank): the rerank pointer policy as a top-k ranker
+  k_max: 20                 # ranked list length: picks without replacement from the rerank.n pool, no STOP
+  static: true              # true: placement-independent observation -> fixed logits per query (exact Plackett-Luce)
+  reward: ndcg@20           # GRPO reward and val selection metric: ndcg@20 | ndcg@10 | mix (mean hit@10/15/20 + MRR)
+  sft_neg_prefix: 0         # extra SFT states with the first m non-C* pool candidates (fused order) already placed

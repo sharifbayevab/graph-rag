@@ -1,0 +1,14 @@
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+
+# data and derived artifacts are not published (dataset not released yet)
+/data/
+/cache/
+/docs/
+/runs/
+!/graphrag/data/
+
+# root .gitignore ENV/ matches graphrag/env/ on case-insensitive filesystems
+!/graphrag/env/

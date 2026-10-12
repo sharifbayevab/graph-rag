@@ -1,0 +1,782 @@
+version: 1
+vertex_kinds: [document, element, entity, concept]
+vertex_types:            # allowed fine `type` per vertex kind; a kind not listed accepts any non-empty type
+  entity: [organ, position, procedure, legal_category]
+# id = edge_type index (PyG, checkpoints): unique, exactly 0..n-1, never renumber.
+# required: must be present and non-None; optional: type-checked when present and not None; any other attr on an
+# edge is a validation error (Ruling R26 (4): an attr must be declared for its edge type here).
+edge_types:
+  CONTAINS:   {id: 0, label: "содержит",           src: [document, element], dst: [element],           required: [],               optional: []}
+  REFERS_TO:  {id: 1, label: "ссылается",          src: [document, element], dst: [document, element], required: [evidence],       optional: [evidence_all, relation]}
+  AMENDS:     {id: 2, label: "уточняет/дополняет", src: [document, element], dst: [document, element], required: [evidence, op],   optional: [evidence_all, date, ops]}
+  REPEALS:    {id: 3, label: "отменяет",           src: [document, element], dst: [document, element], required: [evidence, date], optional: [evidence_all]}
+  REGULATES:  {id: 4, label: "регулирует",         src: [element],           dst: [entity, concept],   required: [evidence],       optional: [evidence_all]}
+  DEFINES:    {id: 5, label: "определяет понятие", src: [element],           dst: [concept],           required: [evidence],       optional: [evidence_all]}
+  RELATED:    {id: 6, label: "тематически связан", src: [document, element], dst: [document, element], required: [weight],         optional: [attached]}
+amend_ops: [edit, add, delete, replace, renumber]
+# REFERS_TO attrs.relation classes (graphrag.kg.extract_ref / acts): amended = the element an amendment
+# instruction head amends; cited_in_amendment = a citation inside the quoted new / replacement text of an
+# amendment (Ruling R20); version_of / translation_of = editions / translations of one act (acts.py)
+ref_relations: [title, agenda, internal, amended, cited_in_amendment, element, act, version_of, translation_of]
+# RELATED latent edges (graphrag.kg.semantic, scripts/build_related.py; Task 8, Ruling R21). This block replaces the
+# plan's `latent:` block (same keys k_ann / k_rel / max_latent_share / theta_sim).
+related:
+  k_ann: 10              # ANN neighbours per chunk (other documents / translation-version groups only)
+  # Ruling R25: the adopted θ (Task 8 R23: θ_b, passed_theta_b; data/graph/related_stats.json theta) and the adopted
+  # edge set (1938 edges; sha256 of the canonical RELATED jsonl, src < dst sorted, attrs {weight}); the Task 9 build
+  # recomputes RELATED from the cached topic vectors at theta_sim and exits 1 unless it reproduces this set exactly
+  theta_sim: 0.65
+  adopted_edges: 1938
+  adopted_edges_sha256: d9c103f563eedf9bb07191bcfcb7c4863df75930291936a1a2ffbc62218d20d6
+  k_rel: 5               # max RELATED edges per vertex (by weight; kept when in the top-k of either end)
+  max_latent_share: 0.30 # §3.4: RELATED / all graph edges
+  theta_grid: {start: 0.30, stop: 0.95, step: 0.01}   # R22: the anisotropy-corrected score is centred near 0
+  null_pairs: 200000     # random cross-group chunk pairs: null cosine distribution
+  null_quantile: 0.999   # theta floor = this quantile of the null, snapped up to the grid
+  seed: 20260928
+  block: 1024            # rows per dense cosine block
+  min_content_tokens: 12 # boilerplate: chunks with fewer content tokens take no part in the ANN
+  formula_max_tokens: 30 # ... procedural speech formulas (chair turns, thanks, voting) below this
+  clause_max_tokens: 30  # ... standard resolution / law clauses (approval, execution control, entry into force) below this
+  adoption_max_tokens: 25
+  gazette_min_numbers: 2
+  # near-duplicate / template documents (>= max_ratio of one doc's and >= min_ratio of the other's chunks with a
+  # cos >= sim neighbour in the other) join one group like translation / version documents (R21 (1))
+  dedup: {sim: 0.97, max_ratio: 0.6, min_ratio: 0.45}
+  # template chunks: cos >= sim ANN neighbours in >= min_docs other documents (session openings, standard final
+  # articles, amending-law heads) are boilerplate and leave the ANN (R21 (2)); found on the first ANN pass
+  template: {sim: 0.90, min_docs: 5}
+  judge: {near: 30, top: 30, near_band: 0.02, top_share: 0.05, batch: 6, text_cap: 600, gate: 0.80, max_raises: 2, raise_step: 0.03, manual: 10,
+          tag: "r23", exclude_dev: true, manual_file: cache/kg/audit_related_manual_r23.json,
+          # Ruling R23 schedule ("ab"): 30 fresh near-θ at θ_a (= the recalibrated start θ); if below the gate, 30 fresh
+          # near-θ at θ_b; then 30 fresh top edges at the adopted θ when the planned calls (batches) fit run_budget.
+          # Adopted: θ_a if it passes, else θ_b if it passes, else the judged θ with the best near precision (ties: higher θ).
+          # θ_b = the user's high-θ precise set (≈0.65, ~2000 edges); the smallest θ with dev-estimated near precision
+          # >= theta_b_est is reported next to it (with the 240-pair dev set it lies above 0.70, ~1000 edges).
+          mode: ab, theta_b: 0.65, theta_b_est: 0.92, run_budget: 20}
+  # --- Ruling R22 (research round on the 120 judged R21 pairs, cache/kg/audit_related_dev.jsonl) ---
+  # score = cosine of bge-m3 vectors of semantic.topic_text (breadcrumb without the session / speaker parts,
+  # stenogram speaker labels removed; cached data/graph/chunk_vecs_topic.npy), anisotropy-corrected
+  # ("all-but-the-top": mean removed, top anisotropy_pcs principal directions projected out, renormalized)
+  score_vectors: topic   # R25: latent_edges raises when this says topic and no topic vectors are passed
+  topic_drop_crumb: ["^senatning \\d+-yalpi majlisi"]
+  anisotropy_pcs: 5
+  mutual_knn: false      # v5 mutual kNN (both ends' top-k_rel): no hubs, but fewer edges and lower dev precision at matched counts
+  dev_theta: true        # θ start = max(θ_grid, θ_null, θ_dev): θ_dev = smallest θ whose dev-estimated near-θ precision >= gate
+  chair_labels: ["raislik qiluvchi"]
+  speech_sections: [STENOGRAMMA]
+  # v4 boilerplate classes: a chunk leaves the ANN when a sentence matches a class and < residual_min_tokens
+  # content tokens (no gazette / speaker-name words; quoted titles of matched sentences do not count) remain.
+  # Patterns match one sentence of text_norm (lowercase, Uzbek in Latin, Russian Cyrillic); `sections` limits a class.
+  residual_min_tokens: 20
+  sentence_rules:
+    implementation:        # "… ушбу Қонуннинг ижросини, ижрочиларга етказилишини ҳамда моҳияти ва аҳамияти … тушунтирилишини таъминласин"
+      patterns: ["ijrosini,? (?:ijrochilarga )?y?etkazilishini", "mohiyati va ahamiyati (?:aholi oʼrtasida )?tushuntirilishini", "исполнени\\w* настоящего закона"]
+    alignment:             # "Вазирлар Маҳкамаси: ҳукумат қарорларини ушбу Қонунга мувофиқлаштирсин; … зид бўлган … бекор қилишларини таъминласин"
+      patterns: ["hukumat qarorlarini ushbu qonunga muvofiqlashtirsin", "ushbu qonunga zid boʼlgan oʼz normativ", "qayta koʼrib chiqishlari(?: va)? bekor qilishlarini", "привести решения правительства в соответствие"]
+    entry_into_force:
+      patterns: ["(?:ushbu|mazkur) (?:qonun|qaror|kodeks)[^.;]{0,80}kuchga kiradi", "настоящ\\w+ (?:закон|постановлени\\w+)[^.;]{0,80}вступает в силу"]
+    committee_conclusion:  # "Юқорида баён этилганларга асосланиб, … 23-моддасининг иккинчи қисмига амал қилиб … ХУЛОСА ҚИЛАДИ: … кун тартибига киритиш ҳақидаги тавсия … Кенгашига киритилсин"
+      patterns: ["yuqorida bayon etilganlarga asoslanib", "23-moddasining ikkinchi qismiga (?:amal qilib|muvofiq)", "x ?u ?l ?o ?s ?a ?q ?i ?l ?a ?d ?i", "kun tartibiga kiritish haqidagi tavsiya", "qonunchilik texnikasi qoidalariga mos keladi", "kengashiga kiritilsin"]
+    resolution_control:    # "… мазкур Қарор ижроси бўйича … Сенатининг Кенгашига ахборот киритсин", "… зиммасига юклансин"
+      patterns: ["mazkur qaror ijrosi boʼyicha", "qarorning ijrosini nazorat qilish", "zimmasiga yuklansin", "kengashiga axborot kiritsin", "контроль за исполнением"]
+    chair_procedure:       # agenda introductions, vote / decision / recess / floor-giving formulas of the chair
+      sections: [STENOGRAMMA]
+      patterns: ["qaror qabul qilindi", "navbatdagi masala", "^masʼul ?[–-]", "soʼz [^.!?]{0,120}beriladi", "savollar,? fikrlar", "fikr-mulohazalar", "^marhamat", "marhamat[.!]?$", "^rahmat", "tanaffus", "ishimizni davom ettiramiz", "ovozga qoʼyaman", "ovoz beriladi", "muzokaralarga oʼtamiz", "majlisni [^.!?]{0,160}olib bor", "kun tartibiga [^.!?]{0,300}(?:kiritilgan|kiritildi)", "^toshkent sh", "yalpi majlisi$", "ish kuni\\)?$", "^\\(?[^()]{0,30}(?:ovoz beriladi|tanaffus|qarshilar|betaraflar)"]
+    session:               # session opening / closing: attendance, quorum, anthem, "… ochiq deb eʼlon qilaman"
+      sections: [STENOGRAMMA]
+      patterns: ["majlisimizda odatdagidek", "ishtirok (?:y?etmoqda|y?etishmoqda)", "kvorum bor", "ochiq deb eʼlon qilaman", "davlat madhiyasi", "yalpi majlisini yopiq deb", "majlisimiz oʼz ishini yakunla", "ish kunini yakunla"]
+    greeting:
+      sections: [STENOGRAMMA]
+      patterns: ["assalomu? alaykum", "^hurmatli [^.!?]{0,120}(?:ishtirokchilari|qatnashchilari|senatorlar|hamkasblar|rais)\\W*$", "^muhtarama rais"]
+    # --- Ruling R23: the five classes missed in R22 (found on the R22 fresh rejections, now part of the dev set) ---
+    chair_agenda:          # speaking-time rules and agenda approval: "Регламент: маърузаларга 10 дақиқагача …", "кун тартиби лойиҳаси сизларга тарқатилган. Таклифлар борми?"
+      sections: [STENOGRAMMA]
+      patterns: ["^reglament\\b", "reglamentga amal qil", "\\d+ daqiqa(?:gacha|dan)\\b", "kun tartibi loyihasi", "takliflar bormi",
+                 "kun tartibiga oʼtishdan oldin", "soʼz olishingiz mumkin", "регламент", "проект повестки"]
+    vote_commission:       # "ялпи мажлис саноқ комиссияси таркиби бўйича қарор лойиҳаси … – комиссия раҳбари; …"
+      sections: [STENOGRAMMA]
+      patterns: ["sanoq komissiya", "komissiya rahbari", "muhokamalarda faol boʼlish", "счетн\\w+ комисси"]
+    preamble_basis:        # enacting formula with the competence basis: "… Сенати тўғрисида"ги Конституциявий қонунининг 9-моддаси … 14-моддасига мувофиқ … Сенати ҚАРОР ҚИЛАДИ";
+      # a preamble that names the considered act ("… қонунини кўриб чиқиб, …") is topical and is not matched
+      patterns: ["^q ?a ?r ?o ?r ?q ?i ?l ?a ?d ?i\\W*$",
+                 "^(?!.*koʼrib chiqib).*moddas\\w*[^.;]{0,40} muvofiq[^.;]{0,80} senati\\W*$",
+                 "^(?!.*koʼrib chiqib).*kelib chiqib,?[^.;]{0,400} senati\\W*$",
+                 "^п ?о ?с ?т ?а ?н ?о ?в ?л ?я ?е ?т\\W*$", "^(?!.*рассмотрев).*в соответствии со стать\\w+[^.;]{0,300} сенат\\w*\\W*$"]
+    report_assignment:     # "… навбатдаги ялпи мажлисида маъруза билан сўзга чиқиш … зиммасига юклатилсин", "… ёзма жавоб тақдим этсин"
+      patterns: ["maʼruza bilan (?:soʼzga )?chiqish", "yozma javob taqdim etsin", "zimmasiga yuklatilsin", "выступ\\w+ с доклад"]
+    dispute_resolution:    # the generic final article "N-модда. Низоларни ҳал этиш. … соҳасидаги низолар қонунчиликда белгиланган тартибда ҳал этилади"
+      patterns: ["^nizolarni hal (?:etish|qilish)\\W*$", "nizolar[^.;]{0,60}belgilangan tartibda hal (?:etiladi|qilinadi)",
+                 "^разрешение споров\\W*$", "споры[^.;]{0,80}разрешаются"]
+  r23_classes: [chair_agenda, vote_commission, preamble_basis, report_assignment, dispute_resolution]
+# Defaults of graphrag.kg.semantic (semantic.DEFAULTS, Ruling R31 (3)): what latent_edges / boilerplate_reason use
+# for a key the caller's cfg does not set; the graph's `related:` block above overrides them (build.related_edges:
+# {**related_defaults, **related}). judge: the Task 8 RELATED judge defaults (scripts/research_related.py).
+related_defaults:
+  k_ann: 10
+  k_rel: 5
+  max_latent_share: 0.30
+  theta_grid: {start: 0.60, stop: 0.95, step: 0.01}
+  null_pairs: 200000
+  null_quantile: 0.999
+  seed: 20260928
+  block: 1024
+  min_content_tokens: 12
+  formula_max_tokens: 30
+  clause_max_tokens: 30
+  adoption_max_tokens: 25
+  gazette_min_numbers: 2
+  boilerplate_parent_types: {реквизиты: signature, заголовок: header}
+  dedup: {sim: 0.97, max_ratio: 0.6, min_ratio: 0.45}
+  template: {sim: 0.90, min_docs: 5}
+  # Ruling R22 (off by default; the `related:` block turns them on)
+  sentence_rules: {}
+  residual_min_tokens: 20
+  anisotropy_pcs: null
+  mutual_knn: false
+  chair_labels: ["raislik qiluvchi"]
+  speech_node_type: выступление
+  speech_sections: [STENOGRAMMA]
+  judge: {near: 30, top: 30, near_band: 0.02, top_share: 0.05, batch: 6, text_cap: 600, gate: 0.80, max_raises: 2,
+          raise_step: 0.03, manual: 10}
+# Chunk-level boilerplate classes of RELATED (semantic.boilerplate_reason, Ruling R21 (2); R31 (3) moved from code).
+# {APO} = any apostrophe of Uzbek Latin (apo). formula: procedural formulas of stenograms / resolutions (short chunks
+# only); clause: standard clauses (approval, "for information", execution control, entry into force); adoption: act
+# title + adoption header (преамбула); gazette_word: words of a gazette citation list that are not content.
+related_boilerplate:
+  apo: "[ʻʼ'`‘’]"
+  formula: '(?i)(?:raislik\s+qiluvchi|раислик\s+қилувчи|marhamat|марҳамат|rahmat|раҳмат|ovoz\s+beril|овоз\s+берил|ovozga\s+qo{APO}?y|овозга\s+қўй|e{APO}?tibor\w*\s+uchun|эътибор\w*\s+учун|eshitiladi|эшитилади|qaror\s+qabul\s+qilindi|қарор\s+қабул\s+қилинди|ma{APO}?qullay|маъқуллай|ma{APO}?qullab|маъқуллаб)'
+  clause: '(?i)(?:ma{APO}?qullansin|маъқуллансин|qabul\s+qilinsin|қабул\s+қилинсин|одобрить|принять\s+к\s+сведению|zimmasiga\s+yuklansin|зиммасига\s+юклансин|возложить\s+на|kuchga\s+kiradi|кучга\s+киради|вступает\s+в\s+силу)'
+  adoption: '(?i)(?:qabul\s+qilingan|қабул\s+қилинган|ma{APO}?qullangan|маъқулланган|imzolangan|имзоланган|принят\w*|одобрен\w*|подписан\w*)'
+  gazette_word: '(?i)^(?:modda\w*|модда\w*|yil\w*|йил\w*|son\w*|сон\w*|ст|статья\w*|год\w*|axborotnoma\w*|ахборотнома\w*|ведомост\w*|собрани\w*|законодательств\w*)$'
+# Task 9 graph build (graphrag.kg.build / features / pyg, scripts/build_graph.py; Ruling R24): artifact
+# <out>/<version>/{nodes.jsonl, edges.jsonl, schema.json, x.npy, pyg.pt, stats.json}; RELATED recomputed at
+# related.theta_sim from the Task 8 vector caches in vec_dir (build.related_edges, Ruling R25: must equal the adopted
+# set); node vectors cached by text sha256 (features.cache)
+build:
+  out: data/graph
+  vec_dir: data/graph    # chunk_vecs.npy / chunk_vecs_topic.npy (+ _ids.json: row ids, text / npy sha256)
+  related_stats: data/graph/related_stats.json
+  cache_passes: [ref_resolve, entities, entity_verify]    # cache/kg/<pass>: extractor LLM answers (version input)
+  features:
+    cache: data/graph/node_vecs.npy
+    body_tokens: 300       # element text: breadcrumb + title + the first body_tokens tokens of its own span
+    title_tokens: 200
+    crumb_tokens: 96
+    max_tokens: 510        # + 2 special tokens = encoder max_seq_length (strict: nothing is truncated silently)
+    entity_type_words: {organ: "davlat organi", position: lavozim, procedure: tartib-taomil, legal_category: "huquqiy kategoriya"}
+llm:
+  model: gpt-4.1
+  # R31 (5): passes.<pass>.max_calls is CUMULATIVE over cache/kg/ledger.json (graphrag.kg.llm.KgLLM._reserve);
+  # max_calls_total caps one run. entity_verify's ledger (201: prompt v1 58 + v2 143) exceeds its 130 -> exhausted.
+  max_calls_total: 800
+  passes:
+    entities: {prompt_version: 1, max_calls: 400, batch_units: 8}
+    entity_verify: {prompt_version: 2, max_calls: 130, batch_items: 40}   # R15 v1 (58 calls); R16 v2: entities passes <= 500 in total
+    ref_resolve: {prompt_version: 2, max_calls: 200}   # v2: date-only / subject rules (Task 4 review of run 1)
+    audit: {prompt_version: 1, max_calls: 200}
+    audit_related: {prompt_version: 1, max_calls: 60}   # Task 8 RELATED judge (R21: 20 calls; R22: +20; R23: +<= 20, judge.run_budget)
+# Task 7 edge-precision audit (graphrag.kg.audit, scripts/audit_graph_edges.py): `major` edges per
+# stratum (all of a `full` stratum or of one with <= major edges), ceil(plant_share * n) planted wrong
+# edges per stratum (Ruling R19), `batch` edges per judge call, context `window` chars around evidence
+audit: {seed: 20260928, major: 40, full: [REPEALS], plant_share: 0.125, batch: 6, window: 400, quote_cap: 1500, target_text_cap: 500}
+# Act-name mentions (graphrag.kg.acts.scan_act_mentions), applied case-insensitively to raw
+# record text. What the scanner emits as a mention name is what act_key() / resolve() receive.
+# Act-title classes (graphrag.kg.acts, Ruling R31 (3): domain regexes as data). Matched against act_key() keys
+# (skeleton: lowercase internal Latin, apostrophe ʼ); {AMEND_WORD} is replaced by amend_word before compiling.
+act_titles:
+  # "ўзгартириш ва қўшимчалар" / "қўшимча ва ўзгартишлар" / "ўзгартиш" … before "киритиш" -> amend_canonical
+  amend_word: '(?:oʼzgarti(?:ri)?sh(?:lar)?|qoʼshimcha(?:lar)?)'
+  amend_tail: '\b{AMEND_WORD}(?:\s+(?:va|hamda)\s+{AMEND_WORD})*(?=\s+kiritish\b)'
+  amend_canonical: 'oʼzgartirish'
+  # an amending / repealing law: its title names what it changes, not a standing act (acts.is_amending)
+  amending: '\bkiritish toʼgʼrisida$|\bkuchini yoʼqotgan deb topish toʼgʼrisida$'
+  # subject-less omnibus titles ("айрим қонун ҳужжатларига … киритиш тўғрисида", acts.is_generic): repeated / extra
+  # amendment words are tolerated ("oʼzgartirish oʼzgartirish kiritish", "qoʼshimcha oʼzgartirish kiritish", Task 4
+  # fix round 2); every variant is canonicalised to generic_key
+  generic: '^ayrim qonun hujjatlariga (?:(?:{AMEND_WORD}|oʼzgartirish|va)\s+)*kiritish toʼgʼrisida$'
+  generic_key: 'ayrim qonun hujjatlariga oʼzgartirish kiritish toʼgʼrisida'
+  # "<name> кодексини тасдиқлаш тўғрисида": the law approving a code (the code-approval alias of its EXT act)
+  code_approval: '^(.+ kodeks) tasdiqlash toʼgʼrisida$'
+  # evidence that a record IS a law text (acts.is_law_text): the adoption line in its own header ("Қонунчилик
+  # палатаси томонидан 2025 йил 22 июлда қабул қилинган" / "Принят Законодательной палатой 13 февраля 2025 года"),
+  # applied to raw record text
+  adopted: '(?i)(?:Қонунчилик палатаси томонидан|Qonunchilik palatasi tomonidan)\s+(?P<a>[^\n]{0,40}?)\s*(?:қабул қилинган|qabul qilingan)|Принят\s+Законодательной\s+палатой\s+(?P<b>[^\n]{0,40})'
+patterns:
+  # one quoted title with its "-ги"/"gi" suffix (may span line breaks and contain one nested
+  # quoted title: “«X»ги Қонунига … киритиш ҳақида”ги); consecutive ones joined by act_list_sep form a list
+  act_quoted: '[«“„"]\s*(?P<name>(?:[«“„"][^«»“”„"\n]{3,300}?[»”“"]\s*[-‐]?\s*(?:ги|gi)\b|[^«»“”„"]){3,500}?)\s*[»”“"]\s*[-‐]?\s*(?:ги|gi)\b'
+  act_list_sep: '^\s*(?:[,;]\s*(?:(?:ва|ҳамда|va|hamda)\s+)?|(?:ва|ҳамда|va|hamda)\s+)$'
+  # after the (last) quoted title: <= 4 plain words (ЎРҚ–800-сонли, Ўзбекистон Республикаси, amaldagi …)
+  # then the head: Қонун… / Кодекс… / Конституциявий Қонун… (not Қонунчилик / қонуний / қонуности)
+  act_head: '\s*(?P<gap>(?:(?:ва|ҳамда|va|hamda)\s+(?:бошқа|boshqa)\s+(?:(?:бир\s+қатор|bir\s+qator)\s+)?)?(?:[\w’ʼʻ''`‘–—‒−-]+\s+){0,4}?)(?P<head>(?:(?:Конституциявий|Konstitu(?:t)?siyaviy)\s+)?(?:Қонун(?!чилик|чи\b|ий|ости)|Qonun(?!chilik|chi\b|iy|osti)|Кодекс|Kodeks)\w*)'
+  # a list in parentheses right after a law head: "… Қонунига («А»ги, «Б»ги ва «В»ги) …"
+  act_paren_head: '(?:Қонун|Qonun|Кодекс|Kodeks)\w*\s*\(\s*$'
+  # a gap word starting like this is another kind of act -> no law mention (“X”gi Prezident Farmoni …)
+  act_head_block: '^(?:фармо|farmo|қарор|qaror|низом|nizom|конвенц|konven|битим|bitim|шартнома|shartnoma|протокол|protokol|дастур|dastur|концепц|konsep|kontsep|стратеги|strategi|резолюц|rezolyu|масала|masala|регламент|reglament|устав|nizomi)'
+  # the cited act's registration number inside the head gap: "ЎРҚ–800-сонли", "310–II-сонли", "PQ-12-son"
+  act_number: '(?:(?:ЎРҚ|ОРҚ|O[ʻʼ''‘’`]?RQ|ЗРУ|ZRU|ПФ|PF|ПҚ|PQ|ПП|УП)\s*[–—‒−-]\s*)?\d+(?:\s*[–—‒−-]\s*[IVXLC]+)?(?=\s*[–—‒−-]?\s*(?:сонли|sonli|сон|son)\b)'
+  # the cited act's adoption date written right before its title: "2011 йил 21 декабрда қабул қилинган «…»",
+  # "… Қонунчилик палатаси томонидан 2025 йил 13 май куни қабул қилинган “…”" (group chamber: a Chamber date)
+  act_context_date: '(?P<chamber>(?:Қонунчилик\s+палатаси|Qonunchilik\s+palatasi)\s+(?:томонидан|tomonidan)\s+)?(?P<date>\d{4}\s*[-–]?\s*(?:йил|yil)\w*\s+\d{1,2}\s*[-–]?\s*[^\W\d]+)\s+(?:(?:куни|kuni)\s+)?(?:(?:қабул\s+қилинган|qabul\s+qilingan|имзоланган|imzolangan)\s+)?$'
+  # the head of a code mention; its name is matched backwards against code_names
+  code_head: '\b(?:кодекс|kodeks)\w*'
+  code_list_sep: '^(?:,|ва|ҳамда|va|hamda)$'
+  # the Constitution (not "Конституциявий"/"konstitutsiyaviy"), incl. "Konstitutsiyamizda"
+  constitution: '(?P<name>(?:Конституция|Konstitu(?:t)?siya)(?:си|si|миз|miz)?(?:нинг|ning|га|ga|ни|ni|да|da|дан|dan|даги|dagi)?)(?![\w])'
+  # REFERS_TO extraction (graphrag.kg.extract_ref, Task 4), applied case-insensitively to raw record
+  # text. Placeholders expanded in code: {NUM} article / part / point number ("27", "74¹"), {DASH} any
+  # dash, {SEP} a list separator word, {ORD} an ordinal word from `ordinals` (optionally "ўн " + ordinal).
+  refs:
+    # "27-модда", "5, 6 ва 27-моддалари", "12–14-моддалар", "21-moddasining"
+    article: '(?<![\w/.])(?P<nums>{NUM}(?:\s*{DASH}?\s*(?:{SEP})\s*{NUM}|\s*{DASH}\s*{NUM})*)\s*{DASH}\s*(?:модда|modda)(?P<tail>\w*)'
+    # right after an article: "… иккинчи қисми", "… 2- ва 3-қисмлари", "… birinchi qismining"
+    part: '\s+(?P<parts>(?:{ORD}|{NUM}\s*{DASH})(?:\s*(?:{SEP})\s*(?:{ORD}|{NUM}\s*{DASH}))*)\s*(?:қисм|qism)\w*'
+    # right after an article / part: "… 3-банди", "… 1, 2-бандлари"
+    point: '\s+(?P<points>{NUM}(?:\s*{DASH}?\s*(?:{SEP})\s*{NUM})*)\s*{DASH}\s*(?:банд|band)\w*'
+    # "ушбу модданинг иккинчи қисми" (the article the mention stands in); part / point follow
+    own_article: '(?<!\w)(?:ушбу|мазкур|ushbu|mazkur)\s+(?:модда|modda)(?:нинг|ning|сининг|sining)?(?=\s)'
+    # right before an article: "ушбу Қонуннинг", "Мазкур Кодекс", "ushbu Qonunning"
+    own_act_before: '(?<!\w)(?:ушбу|мазкур|ushbu|mazkur)\s+(?:Қонун|Кодекс|Qonun|Kodeks)\w*\s*$'
+    # right before an article in a non-law record: "Қонуннинг", "Kodeksning", "loyihaning" (its subject act)
+    subject_before: '(?<!\w)(?:Қонун|Qonun|Кодекс|Kodeks|лойиҳа|loyiha)(?:и|i|си|si)?(?:нинг|ning)?\s*$'
+    # between an act mention and its article: only whitespace and one parenthesis (the gazette list)
+    act_gap: '^\s*(?:\([^()]*\)\s*)?$'
+    # between two article references that share one act: "27-моддаси, 28-моддасининг", "ва"
+    chain_gap: '^\s*(?:[,;]\s*)?(?:(?:ва|ҳамда|va|hamda|ёки|yoki|шунингдек|shuningdek)\s+)?$'
+    # an article heading at the start of a paragraph (own or quoted new article): not a reference
+    heading: '\s*[«“"]?\s*{NUM}\s*{DASH}\s*(?:модда|modda)\.'
+    # Russian: "статьи 5", "части второй статьи 27", "статья 5 настоящего Закона"
+    ru_article: '(?<!\w)(?:част(?:ь|и|ью)\s+(?P<part>{ORD}|\d+)\s+)?стать(?:я|и|е|ю|ей|ями|ях|ям)\s+(?P<nums>{NUM}(?:\s*(?:,|и)\s*{NUM})*)(?!\w)'
+    ru_own_after: '\s+(?:настоящего|настоящей)\s+(?:Закона|Кодекса)'
+    # official-gazette citations (rule 5, gaz#): a parenthesis naming a gazette, or "№ 5, 12-модда"
+    gazette: '(?:Ахборотнома|Axborotnoma|Ведомост|маълумотлари\s+миллий\s+базаси|ma[ʼʻ''`‘’]?lumotlari\s+milliy\s+bazasi|Собрани[ея]\s+законодательства|Национальн\w+\s+баз\w+)'
+    gazette_before: '(?:№\s*[\d/–—-]+\s*,\s*(?:[\d¹²³]+\s*,\s*)*|(?:19|20)\d\d\s*(?:йил|yil|г\.|год)\w*\s*,\s*)$'
+    # an amendment instruction in a node's head paragraph (amendment_context)
+    amend_verb: '(?:киритилсин|тўлдирилсин|баён\s+этилсин|чиқарилсин|чиқариб\s+ташлансин|алмаштирилсин|ўзгартирилсин|ҳисоблансин|kiritilsin|to[ʻʼ''`‘’]ldirilsin|bayon\s+etilsin|chiqarilsin|chiqarib\s+tashlansin|almashtirilsin|o[ʻʼ''`‘’]zgartirilsin|hisoblansin|внести|дополнить|изложить|исключить|заменить)'
+    ru_heading: '\s*[«“"]?\s*Статья\s+{NUM}\.'
+    # "(4-модда)" in a speech / conclusion on the law under consideration (its subject act)
+    paren_bare: '\(\s*$'
+    paren_close: '\s*\)'
+    # a subject act that ratifies / accedes to a treaty: its "(3-modda)" are the treaty's articles
+    ratify: '(?:ратификац|ratifika|қўшилиш|qo[ʻʼ''`‘’]shilish)'
+    # code abbreviations right before an article ("MJtKning 70²-moddasi"): abbreviation -> code name
+    abbreviations:
+      MJtK: Маъмурий жавобгарлик тўғрисидаги кодекси
+      МЖтК: Маъмурий жавобгарлик тўғрисидаги кодекси
+      JK: Жиноят кодекси
+      ЖК: Жиноят кодекси
+      JPK: Жиноят-процессуал кодекси
+      ЖПК: Жиноят-процессуал кодекси
+      JIK: Жиноят-ижроия кодекси
+      ЖИК: Жиноят-ижроия кодекси
+    sep: ',|ва|ҳамда|va|hamda|ёки|yoki|и'
+    num: '\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]*'
+    dash: '[-–‒−—]'
+    # an agenda item / resolution title that names something other than an act
+    title_block: '(?:axborot|ахборот|hisobot|ҳисобот|qaror|қарор|masala|масала|nizom|низом|tayinlash|тайинлаш|saylash|сайлаш|ozod\s+qilish|озод\s+қилиш)\w*\s*$'
+    # … and anywhere in it: parliamentary inquiries, reports, hearings
+    title_block_any: '(?:so[ʻʼ''`‘’]?rov|сўров|eshitish|эшитиш|hisobot|ҳисобот|axborot|ахборот|parlament\s+nazorat\w*\s+tadbir)'
+    # --- fix round 1 (R8) ---
+    # an agenda item (вопрос title) that is not an act: no act edge, wherever the words stand in the title
+    agenda_block: '(?:kengash\w*\s+qarorlar\w*|кенгаш\w*\s+қарорлар\w*|tarkibiga\s+o[ʻʼ''`‘’]zgartirish|таркибига\s+ўзгартириш|tayinla\w*|тайинла\w*|sayla\w*|сайла\w*|lavozim\w*|лавозим\w*|ozod\s+(?:etish|qilish)|озод\s+(?:этиш|қилиш)|ijrosi\b|ижроси\b|amalga\s+oshirilgan\s+ishlar|амалга\s+оширилган\s+ишлар|holati\b|ҳолати\b|chegara\w*\s+o[ʻʼ''`‘’]zgartirish|чегара\w*\s+ўзгартириш|farmonlar\w*\s+tasdiqlash|фармонлар\w*\s+тасдиқлаш|murojaatnoma|мурожаатнома|so[ʻʼ''`‘’]?rov|сўров|axboroti?\b|ахбороти?\b|hisobot\w*|ҳисобот\w*|ma[ʻʼ''`‘’]ruza\w*|маъруза\w*|eshitish|эшитиш|qaror\s+loyiha\w*|қарор\s+лойиҳа\w*|ro[ʻʼ''`‘’]yxatini\s+tasdiqlash|рўйхатини\s+тасдиқлаш|sessiya\w*\s+yakun\w*|сессия\w*\s+якун\w*)'
+    # law-like evidence for an agenda / title act without a scanned mention: the words after the title
+    # ("…toʼgʼrisida]gi qonun haqida"), or a code / ratification / accession / "Конституциявий қонун" title
+    agenda_law_after: '\s*[»”"]?\s*[-‐]?\s*(?:gi|ги|dagi|даги)?\s+(?:O[ʻʼ''`‘’]?zbekiston\s+Respublikasi\s+|Ўзбекистон\s+Республикаси\s+)?(?:qonun|қонун|kodeks|кодекс|konstitutsiyaviy|конституциявий)'
+    agenda_law_before: '(?<!\w)(?:qonun|қонун)\w*\s*[–—-]?\s*[«“"]?\s*$'
+    agenda_law_title: '(?:kodeks\w*|кодекс\w*|ratifika\w*|ратификац\w*|qo[ʻʼ''`‘’]shilish\w*|қўшилиш\w*)'
+    # a parliamentary inquiry resolution: no title link
+    inquiry: '(?<!\w)(?:so[ʻʼ''`‘’]?rov|сўров)(?:(?:i|и)?(?:ni|ни|ga|га|ning|нинг|da|да|dan|дан)|i|и|lar\w*|лар\w*)?(?!\w)|П\s*А\s*Р\s*Л\s*А\s*М\s*Е\s*Н\s*Т\s+С\s*Ў\s*Р\s*О\s*В|P\s*A\s*R\s*L\s*A\s*M\s*E\s*N\s*T\s+S\s*O'
+    # end of a qaror / xulosa heading (its title must stand before this)
+    heading_end: '(?:Қ\s*А\s*Р\s*О\s*Р\s+Қ\s*И\s*Л\s*А\s*Д\s*И|Q\s*A\s*R\s*O\s*R\s+Q\s*I\s*L\s*A\s*D\s*I|Х\s*У\s*Л\s*О\s*С\s*А\s+Қ\s*И\s*Л\s*А\s*Д\s*И|X\s*U\s*L\s*O\s*S\s*A\s+Q\s*I\s*L\s*A\s*D\s*I|кўриб\s+чиқиб|ko[ʻʼ''`‘’]rib\s+chiqib|келиб\s+тушди|kelib\s+tushdi)'
+    # a genitive owner noun right before an article: it decides the owner (never carried from before)
+    owner_noun: '(?<!\w)(?:qonun\w*|қонун\w*|kodeks\w*|кодекс\w*|konvensiya\w*|конвенция\w*|bitim\w*|битим\w*|shartnoma\w*|шартнома\w*|pakt\w*|пакт\w*|protokol\w*|протокол\w*|nizom\w*|низом\w*|farmon\w*|фармон\w*|qaror\w*|қарор\w*|loyiha\w*|лойиҳа\w*)(?:ning|нинг)\s*$'
+    # "asosiy qonunimizning 5-moddasi" = the Constitution
+    basic_law: '(?<!\w)(?:asosiy|асосий)\s+(?:qonun|қонун)\w*\s*$'
+    # an unquoted law title right before an article: "xalqaro shartnomalari toʼgʼrisidagi qonunning 11-moddasiga"
+    unquoted_title: '(?P<t>(?:[\w’ʼʻ''`‘-]+\s+){1,12}?(?:to[ʻʼ''`‘’]g[ʻʼ''`‘’]risidagi|тўғрисидаги|haqidagi|ҳақидаги))\s+(?:qonun|қонун)\w*\s*$'
+    # "kodeksning yangi kiritilayotgan 34¹-moddasiga", "kodeksning 4 ta moddasiga, xususan, 84-…": a gap of
+    # plain words (no sentence end, no other act) between an owner and its article
+    loose_gap: '^[^.;:!?()\n«»“”]{1,70}$'
+    prim_gap: '\d+\s*(?:prim|прим)\s*$'
+    # a plural head after a title ("…”gi qonunlarni"): a list, not one law
+    plural_head: '[^\n]{0,25}?(?:qonunlar|қонунлар|kodekslar|кодекслар)'
+    list_join: '^\s*(?:,|ва|ҳамда|va|hamda)?\s*$'
+    subject_before_loose: '(?<!\w)(?:Қонун|Qonun|Кодекс|Kodeks)(?:и|i|си|si)?(?:нинг|ning)\s+(?:[^\s.;:!?()]+\s+){1,6}$'
+    # a list continued after a count: "ушбу Кодекснинг 5-моддасида 1 та ҳолатда, 6-моддасида …"
+    chain_gap_loose: '^\s*(?:\(?\s*\d+\s*(?:та|ta)\s+(?:ҳолат|holat)\w*\s*\)?)?\s*[,;]?\s*(?:(?:ва|ҳамда|va|hamda|ёки|yoki)\s+)?$'
+    # a section heading paragraph naming an act and ending with ":" ("II. Ер кодексида:")
+    section_heading: '\s*(?:[IVXLC]+|\d{1,2})\s*[.)]\s+'
+    ordinals:        # part numbers written as words (uz-Cyrl, uz-Latn, ru)
+      1: [биринчи, birinchi, первой, первая, первую]
+      2: [иккинчи, ikkinchi, второй, вторая, вторую]
+      3: [учинчи, uchinchi, третьей, третья, третью]
+      4: [тўртинчи, toʻrtinchi, toʼrtinchi, to'rtinchi, четвертой, четвёртой, четвертая]
+      5: [бешинчи, beshinchi, пятой, пятая]
+      6: [олтинчи, oltinchi, шестой, шестая]
+      7: [еттинчи, yettinchi, седьмой, седьмая]
+      8: [саккизинчи, sakkizinchi, восьмой, восьмая]
+      9: [тўққизинчи, toʻqqizinchi, toʼqqizinchi, девятой, девятая]
+      10: [ўнинчи, oʻninchi, oʼninchi, десятой, десятая]
+  # AMENDS ("уточняет/дополняет") extraction (graphrag.kg.extract_amend, Task 5), applied
+  # case-insensitively to raw text outside quotes; placeholders as in `refs` ({NUM} {DASH} {SEP} {ORD}).
+  amend:
+    # operation verb formulas -> amend_ops. Uzbek verbs end their clause ("… таҳрирда баён этилсин");
+    # `ops_ru` verbs (Russian) stand before or after the element ("статью 5 дополнить частью …").
+    ops:
+      replace: '(?:(?:билан|bilan)\s+)?(?:алмаштирилсин|almashtirilsin)'
+      renumber: '(?:деб|deb)\s+(?:ҳисоблансин|hisoblansin)'
+      edit: '(?:(?:таҳрирда|тахрирда|мазмунда|tahrirda|mazmunda)\s+)?(?:баён|bayon)\s+(?:этилсин|қилинсин|etilsin|qilinsin)|(?:ўзгартирилсин|o[ʻʼ''`‘’]zgartirilsin)'
+      add: '(?:(?:билан|bilan)\s+)?(?:тўлдирилсин|to[ʻʼ''`‘’]ldirilsin)'
+      delete: '(?:чиқариб\s+ташлансин|chiqarib\s+tashlansin|чиқарилсин|chiqarilsin)'
+    ops_ru:
+      replace: '(?<!\w)замени(?:ть|в)(?!\w)'
+      renumber: '(?<!\w)считать(?!\w)'
+      edit: '(?<!\w)изложить(?!\w)'
+      add: '(?<!\w)дополнить(?!\w)'
+      delete: '(?<!\w)исключить(?!\w)'
+    # a part / point named without its article ("иккинчи қисми", "қуйидаги мазмундаги 5-банд билан");
+    # the article comes from the instruction's header clause ("1) 9-модда:")
+    part: '(?<![\w-])(?P<parts>(?:{ORD}|{NUM}\s*{DASH})(?:\s*(?:{SEP}|{DASH})\s*(?:{ORD}|{NUM}\s*{DASH}))*)\s*(?:қисм|qism)\w*'
+    point: '(?<![\w/.-])(?P<points>{NUM}(?:\s*{DASH}?\s*(?:{SEP}|{DASH})\s*{NUM})*)\s*{DASH}\s*(?:банд|band)\w*'
+    part_ru: '(?<!\w)част(?:ь|и|ью|ей|ями|ях)\s+(?P<parts>{ORD}(?:\s*(?:,|и|{DASH})\s*{ORD})*)|(?P<parts2>{ORD})\s+част(?:ь|и|ью|ей)(?!\w)'
+    point_ru: '(?<!\w)пункт(?:а|е|ом|ы|ов)?\s+(?P<points>{NUM}(?:\s*(?:,|и|{DASH})\s*{NUM})*)'
+    # a structural unit word; without a number (units below) the target is the act itself
+    coarse: '(?<!\w)(?:\d+\s*{DASH}\s*)?(?:боб|bob|бўлим|bo[ʻʼ''`‘’]lim|илова|ilova|глав[аыуе]|раздел|приложени)\w*'
+    # Ruling R13: numbered chapters / sections / annexes / table positions -> EXT stub segments
+    # (ext_stub_segments); {UNUM} = an arabic or roman number, optionally superscripted ("XXIV¹", "3²").
+    # rank: nesting (илова > бўлим > кичик бўлим > позиция: "4-илова II бўлимининг 48-позицияси" ->
+    # ИЛОВА.4/БЎЛ.2/ПОЗ.48); a unit without rank (боб: numbered across the whole act) starts its own chain;
+    # default: the number of an unnumbered unit ("илованинг 3-банди" = the law's single annex)
+    units:
+      subsection: {code: БЎЛ, rank: 2, rx: '(?<![\w-])(?P<num>{UNUM})\s*{DASH}?\s*(?:кичик|kichik)\s+(?:бўлим|bo[ʻʼ''`‘’]lim)\w*'}
+      section: {code: БЎЛ, rank: 1, rx: '(?<![\w-])(?P<num>{UNUM})\s*{DASH}?\s*(?<!кичик )(?<!kichik )(?:бўлим|bo[ʻʼ''`‘’]lim)\w*'}
+      chapter: {code: ГЛ, rx: '(?<![\w-])(?P<num>{UNUM})\s*{DASH}?\s*(?:боб|bob)(?!о)\w*'}
+      annex: {code: ИЛОВА, rank: 0, default: '1', rx: '(?<![\w-])(?:(?P<num>\d+)\s*{DASH}\s*)?(?:илова|ilova)\w*'}
+      position: {code: ПОЗ, rank: 3, rx: '(?<![\w/.-])(?P<nums>{NUM}(?:\s*{DASH}?\s*(?:{SEP})\s*{NUM})*)\s*{DASH}?\s*(?:позиция|pozitsiya)\w*'}
+      # Ruling R29 A: Russian unit words name the unit before its number ("раздел восьмой", "главу XXIV¹",
+      # "приложение 2", "подраздел 4 раздела II"), or an ordinal before the word ("восьмой раздел"); num2 = the latter
+      subsection_ru: {code: БЎЛ, rank: 2, rx: '(?<!\w)подраздел\w*\s+(?P<num>{UNUM})(?![\w-])|(?<![\w-])(?P<num2>{ORD})\s+подраздел\w*'}
+      section_ru: {code: БЎЛ, rank: 1, rx: '(?<!\w)раздел\w*\s+(?P<num>{UNUM})(?![\w-])|(?<![\w-])(?P<num2>{ORD})\s+раздел\w*'}
+      chapter_ru: {code: ГЛ, rx: '(?<!\w)глав[аыуеой]\w*\s+(?P<num>{UNUM})(?![\w-])|(?<![\w-])(?P<num2>{ORD})\s+глав[аыуеой]\w*'}
+      annex_ru: {code: ИЛОВА, rank: 0, default: '1', rx: '(?<!\w)приложени\w*(?:\s+(?:№\s*)?(?P<num>\d+)(?![\w-]))?'}
+      position_ru: {code: ПОЗ, rank: 3, rx: '(?<!\w)позици\w*\s+(?P<nums>{NUM}(?:\s*(?:,|и|{DASH})\s*{NUM})*)'}
+    unum: '(?:(?:[IVXLC]+|\d+)[⁰¹²³⁴⁵⁶⁷⁸⁹]*|{ORD})'   # R29 A: or an ordinal word ("саккизинчи бўлим")
+    # the leading enumerator of an instruction clause, stripped from the evidence ("1) ", "а) ", "2. ")
+    enum: '\s*(?:(?:\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]*|[а-яўқғҳa-z])\s*[).]\s*|[—–•-]\s*)?(?:(?:ва|ҳамда|va|hamda|и|,)\s+)?'
+  # REPEALS ("отменяет"): a list formula followed by enumerated items (one edge per item), or an
+  # inline formula after the repealed act / element in the same clause
+  repeal:
+    list: '(?:Қуйидагилар|Quyidagilar)\s+(?:ўз|o[ʻʼ''`‘’]z)\s+(?:кучини|kuchini)\s+(?:йўқотган|yo[ʻʼ''`‘’]qotgan)\s+(?:деб|deb)\s+(?:топилсин|topilsin|ҳисоблансин|hisoblansin)\s*:|Признать\s+утратившими\s+силу\s*:'
+    inline: '(?:ўз|o[ʻʼ''`‘’]z)\s+(?:кучини|kuchini)\s+(?:йўқотган|yo[ʻʼ''`‘’]qotgan)\s+(?:деб|deb)\s+(?:топилсин|topilsin|ҳисоблансин|hisoblansin)|признать\s+утративш\w+\s+силу'
+    # the repealed document's head noun before its gazette parenthesis: a non-law act has no act vertex
+    non_law_head: '(?:Қарор|Фармон|Фармойиш|Низом|Qaror|Farmon|Farmoyish|Nizom|Постановлени|Указ|Распоряжени)\w*\s*$'
+    law_head: '(?:Қонун|Кодекс|Qonun|Kodeks|Закон|Кодекс)\w*\s*$'
+  # Concepts (graphrag.kg.concepts, Task 6): an article titled `article_title` ("3-модда. Асосий
+  # тушунчалар") or a node whose text has the `intro` phrase; every following paragraph "term – definition;"
+  # (first `dash` outside parentheses / quotes) is one concept. `alias`: a trailing "(бундан буён матнда X
+  # деб юритилади)" / "(далее – X)" of the term -> attrs.aliases (the title is the term before it).
+  definitions:
+    article_title: '^\s*(?:асосий\s+тушунчалар|asosiy\s+tushunchalar|основные\s+понятия)\s*$'
+    intro: '(?:қуйидаги|quyidagi)\s+(?:асосий\s+)?(?:тушунчалар|tushunchalar)\s+(?:қўлланилади|qo[ʻʼ''`‘’]llaniladi)\s*:|следующие\s+(?:основные\s+)?понятия\s*:'
+    dash: '\s[–—]\s*|\s-\s'
+    alias: '\s*\(\s*(?:бундан\s+буён\s+(?:матнда\s+)?|bundan\s+buyon\s+(?:matnda\s+)?|далее\s*(?:[–—-]\s*)?)(?P<alias>[^()]+?)(?:\s+(?:деб|deb)\s+(?:юритилади|yuritiladi))?\s*\)\s*$'
+    max_term_chars: 300
+    # concept mentions in norms (REGULATES -> concept): a key of >= min_lemmas lemmas, or one lemma of
+    # >= min_single_len characters; a concept matching more than max_norms norms is too generic (no edges)
+    min_lemmas: 2
+    min_single_len: 6
+    max_norms: 200
+# EXT element stub chain segments: node_id code -> node type and the title word ("27-модда").
+# СТ / Ч / П: Task 4; ГЛ / БЎЛ / ИЛОВА / ПОЗ: Task 5 Ruling R13 (EXT acts only; corpus acts use their
+# own ГЛ nodes, never invented ones)
+ext_stub_segments:
+  СТ: {type: статья, word: модда}
+  Ч: {type: часть, word: қисм}
+  П: {type: пункт, word: банд}
+  ГЛ: {type: глава, word: боб}
+  БЎЛ: {type: раздел, word: бўлим}
+  ИЛОВА: {type: приложение, word: илова}
+  ПОЗ: {type: позиция, word: позиция}
+# Real codes of the Republic of Uzbekistan seen in the corpus (name without "кодекси"); a code
+# mention is only emitted for these. "A | B | C": B, C are aliases (spelling / Russian) of A.
+code_names:
+  - Жиноят | Уголовный | Уголовного | Уголовном
+  - Жиноят-процессуал | Жиноий процессуал | Жиноят процесси | Уголовно-процессуальный | Уголовно-процессуального | Уголовно-процессуальном
+  - Жиноят-ижроия | Жиноят-ижроя | Уголовно-исполнительный | Уголовно-исполнительного
+  - Фуқаролик | Гражданский | Гражданского | Гражданском
+  - Фуқаролик процессуал | Гражданский процессуальный | Гражданского процессуального
+  - Иқтисодий процессуал | Экономический процессуальный | Экономического процессуального
+  - Маъмурий жавобгарлик тўғрисидаги | Маъмурий жавобгарлиги тўғрисидаги
+  - Маъмурий суд ишларини юритиш тўғрисидаги
+  - Солиқ | Налоговый | Налогового | Налоговом
+  - Божхона | Таможенный | Таможенного | Таможенном
+  - Меҳнат | Трудовой | Трудового | Трудовом
+  - Оила | Семейный | Семейного
+  - Ер | Земельный | Земельного
+  - Сув | Водный | Водного
+  - Бюджет | Бюджетный | Бюджетного | Бюджетном
+  - Уй-жой | Жилищный | Жилищного
+  - Шаҳарсозлик | Градостроительный | Градостроительного
+  - Сайлов | Избирательный | Избирательного
+  - Тадбиркорлик
+  - Ҳаво | Воздушный | Воздушного
+  - Ахборот
+  - Экология | Экологик | Экологический | Экологического
+  - Ижтимоий
+  - Таълим
+  - Соғлиқни сақлаш
+  - Аҳоли соғлиғини сақлаш | Аҳолининг соғлиғини сақлаш
+  - Нодавлат нотижорат ташкилотлари тўғрисидаги
+# Entities (graphrag.kg.extract_ent, Task 6): dictionary + rules, applied to every record's text.
+# `organs` / `positions`: fixed names -> one vertex each (title = canonical name); a pattern is matched
+# case-insensitively at a word start and extended by \w* (inflection: "Вазирлар Маҳкамасининг").
+# `heads`: a head word whose name is the capitalised word run before it ("Иқтисодиёт ва молия вазирлиги",
+# "Budjet va iqtisodiy islohotlar masalalari qoʼmitasi"); see `name_rules`. Vertex id ENT/<type>/<norm_key>.
+dictionaries:
+  organs:
+    - {title: Олий Мажлис, patterns: ['Олий\s+Мажлис', 'Oliy\s+Majlis']}
+    - {title: Сенат, patterns: ['(?:Олий\s+Мажлис\w*\s+)?Сенат(?!ор)', '(?:Oliy\s+Majlis\w*\s+)?Senat(?!or)']}
+    - {title: Қонунчилик палатаси, patterns: ['(?:Олий\s+Мажлис\w*\s+)?Қонунчилик\s+палата', '(?:Oliy\s+Majlis\w*\s+)?Qonunchilik\s+palata', 'Законодательн\w*\s+палат']}
+    - {title: Вазирлар Маҳкамаси, patterns: ['Вазирлар\s+Маҳкама', 'Vazirlar\s+Mahkama', 'Кабинет\w*\s+Министров']}
+    - {title: Марказий банк, patterns: ['Марказий\s+банк', 'Markaziy\s+bank', 'Центральн\w*\s+банк']}
+    - {title: Бош прокуратура, patterns: ['Бош\s+прокуратура', 'Bosh\s+prokuratura', 'Генеральн\w*\s+прокуратур']}
+    - {title: Олий суд, patterns: ['Олий\s+суд(?!ья)', 'Oliy\s+sud(?!ya)', 'Верховн\w*\s+суд(?!ь)']}
+    - {title: Конституциявий суд, patterns: ['Конституциявий\s+суд(?!ья)', 'Konstitutsiyaviy\s+sud(?!ya)', 'Конституционн\w*\s+суд(?!ь)']}
+    - {title: Ҳисоб палатаси, patterns: ['Ҳисоб\s+палата', 'Hisob\s+palata', 'Счетн\w*\s+палат']}
+    - {title: маҳаллий давлат ҳокимияти органлари, patterns: ['маҳаллий\s+давлат\s+ҳокимият\w*\s+орган', 'mahalliy\s+davlat\s+hokimiyat\w*\s+organ', 'местн\w*\s+орган\w*\s+государственн\w*\s+власт']}
+    - {title: ҳокимлик, patterns: ['ҳокимлик', 'hokimlik', 'хокимият', 'хокимлик']}
+  positions:
+    - {title: Президент, patterns: ['Президент(?!лик)', 'Prezident(?!lik)']}
+    - {title: Бош прокурор, patterns: ['Бош\s+прокурор(?!атура)', 'Bosh\s+prokuror(?!atura)', 'Генеральн\w*\s+прокурор(?!атур)']}
+    - {title: Бош вазир, patterns: ['Бош\s+вазир(?!лик|лиг)', 'Bosh\s+vazir(?!lik|lig)', 'Премьер-министр']}
+    - {title: Инсон ҳуқуқлари бўйича вакил (омбудсман), patterns: ['(?<!Болалар )(?<!Бола )(?<!Бизнес )(?<!Бизнес-)(?<!Bolalar )(?<!Bola )(?<!Biznes )(?<!Biznes-)(?<!болалар )(?<!bolalar )(?<!бизнес )(?<!biznes )(?:омбудсман|ombudsman)', 'Инсон\s+ҳуқуқлари\s+бўйича\s+вакил', 'Inson\s+huquqlari\s+bo[ʻʼ''`‘’]yicha\s+vakil', 'Уполномоченн\w*\s+по\s+правам\s+человека']}
+    - {title: Бола ҳуқуқлари бўйича вакил, patterns: ['(?:Болалар|Бола|Bolalar|Bola)\s+(?:омбудсман|ombudsman)', 'Бола\s+ҳуқуқлари\s+бўйича\s+вакил', 'Bola\s+huquqlari\s+bo[ʻʼ''`‘’]yicha\s+vakil']}
+    - {title: Тадбиркорлик субъектларининг ҳуқуқлари ва қонуний манфаатларини ҳимоя қилиш бўйича вакил, patterns: ['(?:Бизнес|Biznes)[\s-]+(?:омбудсман|ombudsman)', 'Тадбиркорлик\s+субъектларининг\s+ҳуқуқлари\s+ва\s+қонуний\s+манфаатларини\s+ҳимоя\s+қилиш\s+бўйича\s+вакил', 'Tadbirkorlik\s+sub[ʻʼ''`‘’]?yektlarining\s+huquqlari\s+va\s+qonuniy\s+manfaatlarini\s+himoya\s+qilish\s+bo[ʻʼ''`‘’]yicha\s+vakil']}
+    - {title: раислик қилувчи, patterns: ['Раислик\s+қилувчи', 'Raislik\s+qiluvchi', 'Председательствующ']}
+    - {title: сенатор, patterns: ['сенатор', 'senator']}
+    - {title: депутат, patterns: ['депутат', 'deputat']}
+    - {title: ҳоким, patterns: ['ҳоким(?!лик|лиг|ият)', 'hokim(?!lik|lig|iyat)']}
+  heads:
+    organ:
+      - 'вазирлиг\w*'
+      - 'vazirlig\w*'
+      - 'қўмита(?:си|лари)\w*'
+      - 'qo[ʻʼ''`‘’]mita(?:si|lari)\w*'
+      - 'агентлиг\w*'
+      - 'agentlig\w*'
+      - 'инспекция(?:си|лари)\w*'
+      - 'inspeksiya(?:si|lari)\w*'
+      - 'комиссия(?:си|лари)\w*'
+      - 'komissiya(?:si|lari)\w*'
+      - 'кенгаши\w*'
+      - 'kengashi\w*'
+      - 'ҳокимлиги\w*'
+      - 'hokimligi\w*'
+    position:
+      - 'вазир(?:и|ининг|ига|идан|ини|лари|ларининг)(?!\w)'
+      - 'vazir(?:i|ining|iga|idan|ini|lari|larining)(?!\w)'
+      - 'раис(?:и|ининг|ига|идан|ини)(?!\w)'
+      - 'rais(?:i|ining|iga|idan|ini)(?!\w)'
+      - 'вакил(?:и|ининг|ига|идан|ини)(?!\w)'
+      - 'vakil(?:i|ining|iga|idan|ini)(?!\w)'
+  name_rules:
+    max_words: 10            # words before the head
+    # a word that ends a name going backwards (lower-cased; apostrophes folded to ʼ)
+    stop_words: [ушбу, мазкур, бунда, шунингдек, шу, бу, ёки, билан, учун, томонидан, орқали, мувофиқ, кўра, асосан, биргаликда, ҳамкорликда, тегишли, ваколатли, барча, айрим, ҳар, сўз, савол, саволим, мурожаат, ҳурматли, деган, сўзлар, мен, биз, сиз, улар, ҳамма, янги, ushbu, mazkur, bunda, shuningdek, shu, bu, yoki, bilan, uchun, tomonidan, orqali, muvofiq, koʼra, asosan, birgalikda, hamkorlikda, tegishli, vakolatli, barcha, ayrim, har, soʼz, savol, savolim, murojaat, hurmatli, degan, soʼzlar, men, biz, siz, ular, hamma, yangi]
+    # a capitalised word at a sentence start begins a name only if the corpus mostly writes it capitalised
+    # mid-sentence (proper-name word: "Adliya", not "Chunki" / "Hozir" / "Maʼlumki"); casing counts come from
+    # the records being processed. A comma is never crossed between two capitalised words
+    # ("Vazirlar Mahkamasi, Kadastr agentligi").
+    # "ва"/"va" inside a name ("Иқтисодиёт ва молия вазирлиги") is allowed when a word follows it in the name
+    inner_words: [ва, va, ҳамда, hamda, и]
+    # a word ending like this ends the name (genitive owner, dative / locative / ablative, "-даги" qualifier)
+    stop_suffix: '(?:нинг|ning|га|ga|да|da|дан|dan|даги|dagi|миз|нгиз|miz|ngiz|(?<!ор)ган|(?<!or)gan)$'
+    # a head word with a 1st / 2nd person possessive is not a name ("vazirligimiz", "agentligingiz")
+    head_block: '(?:миз|нгиз|miz|ngiz)\w{0,6}$'
+    # "Ўзбекистон Республикаси(нинг)" before a name is dropped
+    prefix: '^(?:Ўзбекистон\s+Республикаси\w*|O[ʻʼ''`‘’]?zbekiston\s+Respublikasi\w*|Республики\s+Узбекистан)\s+'
+    # key rewrites (regex on norm_key -> replacement): "Олий Мажлис Сенати" = "Сенат" (LLM names too)
+    key_rewrites:
+      - ['^oliy majlis (?=senat|qonunchilik palata|inson huquq|bola huquq)', '']
+      - ['^(inson huquq boʼyicha vakil) ombudsman$', '\1']
+      - ['^ombudsman$', 'inson huquq boʼyicha vakil']
+      # R16: "X ҳузуридаги Y" -> Y (the owned body / post); an owner stays a separate mention
+      - ['^.* huzur (?=\S)', '']
+      # R17: cross-script bank; regional representatives of the child ombudsman
+      - ['(?<!\S)банк(?!\S)', 'bank']
+      - ['^(?:bola (?:ombudsman|huquq boʼyicha vakil)|ombudsman)(?: hudud)? mintaqaviy vakil$', 'bola huquq boʼyicha vakil mintaqaviy vakil']
+    # a lower-case owner right before a position head: "қўмита раиси", "hukumat vakili"
+    generic_owners: [маҳалла, mahalla, қўмита, qoʼmita, комиссия, komissiya, кенгаш, kengash, ҳукумат, hukumat, палата, palata, сенат, senat, вазирлик, vazirlik, агентлик, agentlik, ҳокимлик, hokimlik]
+  # --- fix round 1 (Ruling R15) ---
+  # a mention in these contexts is dropped (no vertex mention, no REGULATES): inside an official-gazette
+  # citation parenthesis (patterns.refs.gazette), inside an act title / code name (acts.scan_act_mentions),
+  # or in a committee conclusion's author heading: the paragraph before a `boilerplate` heading and the
+  # heading's own text before it ("Yuqorida bayon etilganlarga asoslanib, … qoʼmitasi" / "XULOSA QILADI:")
+  context:
+    boilerplate: '(?:Х\s?У\s?Л\s?О\s?С\s?А\s+Қ\s?И\s?Л\s?А\s?Д\s?И|X\s?U\s?L\s?O\s?S\s?A\s+Q\s?I\s?L\s?A\s?D\s?I|хулоса\s+қилади|xulosa\s+qiladi)'
+  # names that are persons or clauses, not entities
+  name_filter:
+    max_words: 15
+    patronymic: '(?i)\w+(?:ovich|evich|ovna|evna|ович|евич|овна|евна)(?!\w)|(?<!\w)(?:o[ʻʼ''`‘’]?g[ʻʼ''`‘’]?li|ўғли|qizi|қизи)(?!\w)'
+  # retyping by the key's last lemma (internal Latin / Russian normal form), then a majority vote per key
+  retype:
+    position: [prokuror, vazir, rais, vakil, deputat, senator, hokim, ombudsman, sudya, prezident, spiker, notarius, inspektor, oʼrinbosar, kotib, boshliq, direktor, rahbar, прокурор, министр, председатель, депутат, сенатор, хоким, судья, уполномоченный]
+    organ: [vazirlik, qoʼmita, agentlik, sud, prokuratura, hokimlik, inspeksiya, inspektsiya, palata, kengash, komissiya, departament, boshqarma, министерство, комитет, агентство, суд, прокуратура, палата, совет, комиссия, инспекция]
+    order: [organ, position, legal_category, procedure]   # majority-vote tie break
+    # after verification: a "procedure" named by a document noun is a legal_category (a contract, a
+    # licence, a permit, a certificate …: "қўшиб олиш тўғрисидаги шартнома", "… ҳуқуқи учун гувоҳнома")
+    documents: [shartnoma, ishonchnoma, guvohnoma, litsenziya, ruxsatnoma, sertifikat, patent, xabarnoma, hujjat, dalolatnoma, varaqa, talabnoma, ariza, договор, доверенность, лицензия, свидетельство, уведомление, разрешение, сертификат, патент]
+  # --- fix round 2 (Ruling R16) ---
+  # An entity's type is decided by its head: the key's last lemma (Uzbek), the first (or second, after an
+  # adjective) lemma (Russian). `heads`: the head nouns of a type; `conditional`: a head that counts only
+  # when the key also holds one of the listed lemmas (@organ / @position = any head of that type);
+  # `category`: heads that make the name a legal_category (funds, organisations as legal entities,
+  # employees, founders, private roles, documents). A head in no list: legal_category names stay, the
+  # others are dropped. Fixed dictionary names keep their type.
+  types:
+    organ:
+      heads: [vazirlik, qoʼmita, agentlik, sud, prokuratura, hokimlik, hokimiyat, inspeksiya, inspektsiya, palata, kengash, komissiya, departament, boshqarma, bank, markaz, organ, muassasa, hayʼat, majlis, senat, xizmat, maʼmuriyat, boʼlinma, idora, kotibiyat, apparat, qoʼmondonlik, hukumat, parlament, kengesi, institut, byuro, gvardiya, administratsiya, administratsiyasi, maʼmuriyati, direktsiya, fraktsiya, fraksiya, assambleya, akademiya, universitet, laboratoriya, advokatura, shifoxona, vakolatxona, filial]
+      ru: [министерство, комитет, агентство, суд, прокуратура, палата, совет, комиссия, орган, банк, служба, инспекция, управление, департамент, центр, кабинет, сенат, парламент, правительство]
+      generic_first: [manfaatdor, tegishli, boshqa, barcha, ayrim, har, zarur, yuqori, oʼz]
+    position:
+      heads: [vazir, rais, prokuror, sudya, hokim, prezident, spiker, ombudsman, senator, deputat, direktor, inspektor, notarius, tergovchi, kotib, elchi, konsul, mudir, mudiri, kotibi, attashe]
+      conditional:
+        oʼrinbosar: ['@position', '@organ']
+        vakil: [huquq, ombudsman]
+        rahbar: ['@organ']
+        ijrochi: [davlat]
+        yordamchi: ['@position']
+        boshliq: ['@organ']
+        boshligʼi: ['@organ']
+        boshliqlar: ['@organ']
+      ru: [председатель, министр, прокурор, судья, президент, уполномоченный, депутат, сенатор, хоким, премьер-министр]
+    procedure:
+      heads: [tartib, taomil, ekspertiza, akkreditatsiya, sertifikatlash, sertifikatlashtirish, litsenziyalash, sanatsiya, tugatish, bankrotlik, mediatsiya, ratifikatsiya, denonsatsiya, apellyatsiya, kassatsiya, taftish, tekshiruv, audit, verifikatsiya, attestatsiya, privatizatsiya, rejim, patentlash, koʼrik, tekshirish, konvertatsiya, xususiylashtirish, auktsion, auksion, inventarizatsiya, deklaratsiyalash, muhokama, yarash, imtihon]
+      # a generic verbal head counts only right after a named-procedure noun ("аккредитациядан ўтказиш",
+      # "санация қилиш", "тугатиш жараёни", "банкрот деб топиш ва тугатишга доир иш юритиш")
+      conditional: [oʼtkazish, oʼtkazganlik, qilish, etish, jarayon, yuritish, jarayoni, oshirish]
+      tails: ['roʼyxat oʼtkazilish', 'roʼyxat oʼtkazganlik', 'ovoz berish', 'taʼsir baholash', 'hisob yuritish', 'davlat hisob', 'reestr chiqarish', 'reestr kiritish', 'nazorat olish', 'chiqarib yuborish', 'qoʼshib yuborish', 'qoʼshib yuborilish', 'davlat nazorat', 'notarial harakat', 'jamiyat chiqish', 'jamiyat boʼlish', 'qoʼshib olish', 'ajratib chiqarish', 'hisob chiqarish', 'parlament soʼrov yuborish', 'parlament soʼrov', 'taomil amal oshirish', 'ish yuritish', 'roʼyxat oʼtkazish', 'roʼyxat olish', 'roʼyxat oʼtish', 'hisob olish', 'hisob qoʼyish', 'tartib koʼrish', 'tartib koʼrib chiqish', 'qayta koʼrish', 'qayta tashkil etish']
+      ru: [исполнение, списание, конвертация, ликвидация, санация, регистрация, лицензирование, аккредитация, экспертиза, проверка, реорганизация, процедура, банкротство, медиация, ратификация, аудит, сертификация, приватизация, денонсация]
+      # R17: a verb head with a procedural object ("кассация шикоятини иш юритишга қабул қилиш",
+      # "қонунчилик ташаббуси … кўриб чиқиш", "шикоят бериш")
+      object_verbs: ['koʼrib chiqish', 'qabul qilish', 'berish', 'yuborish', 'koʼrish', 'eshitish', 'ijro etish', 'olish', 'rasmiylashtirish', 'tayinlash']
+      objects: [shikoyat, ariza, ish, tashabbus, soʼrov, murojaat, protest, loyiha, talabnoma, taklif, axborot, hisobot, maʼruza, hujjat, hukm, patent, litsenziya, ruxsatnoma, guvohnoma, polis, pensiya, nafaqa]
+    category:
+      heads: [uyushma, assotsiatsiya, ittifoq, jamgʼarma, fond, hisobvaraq, tashkilot, korxona, jamiyat, xodim, shaxs, muassis, ishtirokchi, aʼzo, xizmatchi, mutaxassis, buxgalter, boshqaruvchi, likvidator, tugatuvchi, advokat, vakil, rahbar, ijrochi, oʼrinbosar, yordamchi, fuqaro, subʼekt, shartnoma, ishonchnoma, guvohnoma, litsenziya, ruxsatnoma, sertifikat, patent, xabarnoma, hujjat, dalolatnoma, varaqa, talabnoma, ariza, shikoyat, protest, ajrim]
+      # R17 legal_category: activity / verbal-noun heads, abstract heads and obligations are no categories
+      activity: [savdo, faoliyat, boshqaruv, muomala, ishlab, xizmat koʼrsatish, taʼlim tarbiya]
+      nominalisation: '(?:ish|ash|sh)$'
+      abstract: [sifat, tarmoq, shakl, atrof, muhit, soha, yoʼnalish, masala, holat, jarayon, maqsad, ehtiyoj, sharoit, imkoniyat, natija, daraja, tur, qism, chora, tadbir, munosabat, qoida, prinsip, vazifa, funksiya, vakolat, siyosat, intizom, tuman, shahar, viloyat, hudud, sohasi, отношение, форма, сфера, отрасль]
+      obligation: [majburiyat, masʼuliyat, javobgarlik, qarzdorlik, обязательство, ответственность]
+      # a post named as a category ("Ҳукумат аъзолари", "Сенат аъзоси") -> position
+      member_heads: [aʼzo]
+      member_owners: [hukumat, senat, kengash, palata, komissiya, qoʼmita, parlament, majlis]
+      # non-state bodies (associations, farmers' / public councils, chambers of commerce) -> legal_category
+      nonstate_markers: [fermer, tadbirkor, jamoatchilik, homiylik, savdo sanoat, hunarmand, taftish]
+      nonstate_heads: [kengash, palata, markaz, komissiya]
+      # legal_category names headed by a quantity / amount are not categories ("… баланс қиймати")
+      quantity: [qiymat, miqdor, summa, foiz, muddat, hajm, narx, stavka, koʼrsatkich, ulush, foyda, zarar, xarajat, nobudgarchilik, стоимость, сумма, размер, срок, доля]
+      ru: [фонд, организация, лицо, работник, сотрудник, управлять, управляющий, ликвидатор, акционер, кредитор, договор, доверенность, лицензия, свидетельство, уведомление, разрешение, сертификат, патент, общество]
+  # a name whose last word is a finite verb / participle is a clause, not an entity (replaces the word cut)
+  clause_final: '(?:ади|йди|моқда|син|сун|лади|илади|бўлса|мумкин|лозим|керак|эмас|этади|қилади|ган|дир|ганлиги|ганлик|adi|ydi|moqda|sin|sun|ladi|iladi|boʼlsa|mumkin|lozim|kerak|emas|etadi|qiladi|(?<!or)gan|dir|ganligi|ganlik)$'
+  # REGULATES context (R16 rule 4): an owner right before "ҳузуридаги" (the edge goes to the owned body only);
+  # words inside «…» деган сўзлар (replaced / deleted words); intro / closing boilerplate sentences; an organ
+  # name used as a bare modifier ("Марказий банк курси")
+  context2:
+    owner_after: '^\s*(?:ҳузуридаги|huzuridagi|қошидаги|qoshidagi|тасарруфидаги|tasarrufidagi|ҳузурида|huzurida)(?!\w)'
+    quoted_words_after: '^\s*[»”"]*\s*(?:деган|degan)\s+(?:сўз|so[ʻʼ''`‘’]z|рақам|raqam|жумла|jumla)'
+    boilerplate:
+      - '(?:томонидан|tomonidan)[^.;\n]{0,140}?(?:қабул\s+қилинган|qabul\s+qilingan)'
+      - '(?:кун\s+тартибига\s+киритиш\s+ҳақидаги\s+тавсия|kun\s+tartibiga\s+kiritish\s+haqidagi\s+tavsiya)[^.;\n]{0,200}?(?:киритилсин|kiritilsin)'
+      - '(?:маъруза\s+билан\s+сўзга\s+чиқиш|ma[ʻʼ''`‘’]ruza\s+bilan\s+so[ʻʼ''`‘’]zga\s+chiqish)[^.;\n]{0,300}?(?:топширилсин|topshirilsin)'
+      - '(?:кўриб\s+чиқиш\s+учун|ko[ʻʼ''`‘’]rib\s+chiqish\s+uchun)\s+(?:келиб\s+туш|kelib\s+tush|юборил|yuboril|киритил|kiritil)\w*'
+    modifier_after: '^\s*(?:курс|kurs|ставка|stavka|қайта\s+молиялаш|qayta\s+moliyalash)\w*'
+    # a genitive owner of an act ("Президентининг 2025 йил 15 апрелдаги «…» Фармони", "Вазирлар Маҳкамасининг …
+    # қарори"): the act noun within `act_owner_window` chars, with <= act_owner_words other words between
+    # (quoted titles, dates and numbers not counted), no sentence break
+    act_owner_noun: '(?<!\w)(?:фармон|қарор|фармойиш|мурожаатнома|топшириқ|farmon|qaror|farmoyish|murojaatnoma|topshiriq|указ|постановлени|распоряжени|послани)\w*'
+    act_owner_window: 300
+    act_owner_words: 8
+    # committee conclusions only: the drafter of the law ("… вазирлиги томонидан ишлаб чиқилди")
+    drafted_by: '(?:томонидан|tomonidan|ташаббуси\s+билан|tashabbusi\s+bilan)[^.;\n]{0,160}?(?:ишлаб\s+чиқил|ishlab\s+chiqil|тайёрлан|tayyorlan|киритил(?:ди|ган)|kiritil(?:di|gan))\w*'
+    # Ruling R20 (b), applied after verification (no LLM input changes): adoption / approval / signature
+    # lines state legislative history, not regulation -> no REGULATES for the agent (a mention followed by
+    # `adoption_agent_after`) of a sentence whose predicate is `adoption_final` ("… ишлаб чиқилди ва
+    # Қонунчилик палатаси томонидан қабул қилинди."), for a mention right after a Russian `adoption_before`
+    # short participle naming a chamber (`adoption_before_names`: "Принят Законодательной палатой", "Одобрен
+    # Сенатом"; not "принятым Центральным банком решением"), and for any mention in a short
+    # (<= adoption_header_chars) header paragraph `adoption_header` ("Сенат томонидан 2024 йил 5 июнда маъқулланган")
+    # Ruling R29 B: + the past history predicates "… рад этилган." / "rad etilgan." and the pluperfect "… имзоланган
+    # эди." (a converb "қабул қилиниб, …" / "маъқулланиб, …" in the sentence then needs no own rule); a present /
+    # conditional norm ("… маъқулланиб, … юборилади", "рад этилган тақдирда") does not end so
+    adoption_final: '(?:қабул\s+қилинди|маъқулланди|маъқуллади|имзоланди|qabul\s+qilindi|ma[ʻʼ''`‘’]qullandi|ma[ʻʼ''`‘’]qulladi|imzolandi|(?:рад|rad)\s+(?:этилган|etilgan)|(?:қабул\s+қилинган|маъқулланган|имзоланган|рад\s+этилган|qabul\s+qilingan|ma[ʻʼ''`‘’]qullangan|imzolangan|rad\s+etilgan)\s+(?:эди|edi))\W*$'
+    # R29 B: a chamber in the genitive before its (numbered) plenary session ("Олий Мажлиси Сенатининг 25 ялпи
+    # мажлисида … маъқулланиб, … имзоланган эди.") is the adopting agent too (with an adoption_final sentence)
+    adoption_session_after: '^\w*\s+(?:\d+\s*[-–]?\s*(?:сонли\s+|sonli\s+)?)?(?:ялпи\s+мажлис|yalpi\s+majlis)\w*'
+    adoption_agent_after: '^\w*\s+(?:томонидан|tomonidan)(?!\w)'
+    adoption_before: '(?<!\w)(?:принят|одобрен|подписан)[аоы]?\s+$'
+    adoption_before_names: '^(?:Законодательн|Сенат)'
+    adoption_header: '(?m)^[^.;:\n]{0,80}(?:томонидан|tomonidan)\s[^.;:\n]{0,60}(?:қабул\s+қилинган|маъқулланган|qabul\s+qilingan|ma[ʻʼ''`‘’]qullangan)\W*$|^\s*(?:принят|одобрен)[аоы]?\s+(?:Законодательн\w*\s+палат\w*|Сенат\w*)[^\n]{0,60}$'
+    adoption_header_chars: 160
+  # cross-language / variant names of one entity (R16 rule 7): every name's key maps to the canonical key
+  aliases:
+    - {canonical: Иқтисодиёт ва молия вазирлиги, names: [Министерство экономики и финансов]}
+    - {canonical: Адлия вазирлиги, names: [Министерство юстиции]}
+    - {canonical: Омонатларни кафолатлаш агентлиги, names: [Агентство по гарантированию вкладов]}
+    - {canonical: Бола ҳуқуқлари бўйича вакил, names: [Bolalar ombudsmani, Болалар омбудсмани, Bola ombudsmani]}
+    - {canonical: Тадбиркорлик субъектларининг ҳуқуқлари ва қонуний манфаатларини ҳимоя қилиш бўйича вакил, names: [Бизнес омбудсман, Biznes ombudsman, Бизнес-омбудсман]}
+    - {canonical: Инсон ҳуқуқлари бўйича вакил, names: [Уполномоченный по правам человека]}
+  # applied after verification (R16 strict self-check; no LLM input changes): anaphoric names ("уларнинг
+  # оила аъзолари"), names with numbers / head counts ("юз минг нафардан кам бўлмаган фуқаролари"), bare
+  # generic organ words ("вазирлик"), organ / position alternatives ("апелляция ёки кассация инстанцияси суди")
+  post_verify:
+    anaphora_first: [уларнинг, унинг, ўз, ўзининг, ушбу, мазкур, шу, ularning, uning, oʼz, oʼzining, ushbu, mazkur, shu, их, его, её]
+    count_words: '(?i)\d|(?<!\w)(?:нафар|nafar)\w*'
+    # an agent phrase inside a name is a clause fragment ("Qoʼmita tomonidan manfaatdor vazirliklar")
+    fragment_words: '(?i)(?<!\w)(?:томонидан|tomonidan)(?!\w)'
+    generic_organ_keys: [filial, vakolatxona, kotibiyat, bank, банк, vazirlik, agentlik, qoʼmita, komissiya, idora, organ, muassasa, markaz, kengash, boshqarma, xizmat, inspeksiya, departament, boʼlinma, davlat organ, davlat muassasa, davlat tashkilot]
+    # bare generic posts (no owner): dropped
+    generic_position_keys: [direktor, rais, rahbar, boshliq, boshligʼi, oʼrinbosar, kotib, mudir, yordamchi, директор, председатель, руководитель]
+    # corporate bodies / roles (a company's boards and officers are not public institutions / posts) -> legal_category
+    corporate_lemmas: [jamiyat, aksiyador, kollegial, yakkaboshchilik, kuzatuv, xususiy, tijorat, общество, акционер, наблюдательный, правление, частный, коммерческий]
+    # banks other than the fixed Марказий банк are legal entities (legal_category), not state organs
+    category_organ_heads: [bank, банк, laboratoriya, institut, akademiya, universitet, shifoxona]
+    # a position name listing several posts ("… бошлиғи ва унинг ўринбосарлари", "… ўринбосари – … раиси"): dropped
+    position_list: '(?i)\s(?:ва|va|ҳамда|hamda|и)\s+(?:унинг|uning|уларнинг|ularning)\s|\s[–—]\s'
+    # a name followed by "… тўғрисидаги кодекс / қонун" is part of an unquoted act title: no REGULATES
+    act_title_after: '(?i)^\s*(?:[^\s.;:]+\s+){0,5}?(?:(?:тўғрисидаги|to[ʻʼ''`‘’]g[ʻʼ''`‘’]risidagi|ҳақидаги|haqidagi)\s+(?:кодекс|kodeks|қонун|qonun)|(?:ҳақида|haqida|тўғрисида|to[ʻʼ''`‘’]g[ʻʼ''`‘’]risida)[ \t]*(?:\n|$))'
+    # Ruling R20 (d), after verification (the dictionary pattern itself feeds the entity_verify input, so a
+    # change there would miss the cache): a fixed-dictionary match of `title` whose matched word fits the regex
+    # is not that entity ("депутатлик" = deputyship, not the post "депутат") -> mention dropped
+    fixed_exclude:
+      депутат: '(?i)^(?:депутат|deputat)(?:лик|лиг|lik|lig)'
+    # a fixed match of `title` with the owner right before (`before`, anchored at the mention start) or after
+    # (`after`, anchored at its end) is the owner's own post: the mention is extended over the owner and gets
+    # `key` / `type` ("Қонунчилик палатаси депутатлари" -> the position "qonunchilik palata deputat", not the
+    # generic "депутат"; the owner organ inside it is then the post's owner, not a REGULATES target)
+    fixed_owner_rewrites:
+      - {title: депутат, type: position, key: qonunchilik palata deputat,
+         before: '(?i)(?<!\w)(?:(?:Олий\s+Мажлис\w*|Oliy\s+Majlis\w*)\s+)?(?:Қонунчилик\s+палата\w*|Qonunchilik\s+palata\w*)\s+$',
+         after: '(?i)^\s+Законодательн\w*\s+палат\w*(?:\s+Олий\w*\s+Мажлис\w*)?'}
+  # --- fix round 4 (Ruling R18): deterministic post-verification dedup / restore / split rules --------
+  # Entities of one type are grouped by a dedup key: transliteration folds, owner-prefix rewrites, light
+  # verb / generic-head stripping (procedures), then cross-language / variant pairs. The group's vertex id
+  # keeps one of its original keys (the one equal to the dedup key, else the most frequent), so unmerged
+  # entities keep their ids. No LLM input changes (applied after the entity_verify pass).
+  dedup:
+    # regex folds on the key that only reflect Cyrillic -> Latin ambiguity (ц = ts / s, е = ye / e, ъе = ʼe /
+    # ye, ё after a consonant, лю = lyu / lu), and a plural "-lar" left unlemmatized ("erlar", "brokerlar")
+    translit:
+      - ['ts', 's']
+      - ['(?<=[bdfgklmnprstvxz])ʼ(?=e)', '']
+      - ['(?<![a-zʼ])ye', 'e']
+      - ['(?<=[bdfgklmnprstvxz])ye', 'e']
+      - ['(?<=[bdfgklmnprstvxz])yo(?!ʼ)', 'o']
+      - ['(?<=l)yu', 'u']
+      - ['(?<=\w{2})lar(?!\S)', '']
+    # passive / variant verbal nouns of procedures
+    token_map: {oʼtkazilish: oʼtkazish, yuborilish: yuborish, tugatilish: tugatish, qoʼshib yuborilish: qoʼshib yuborish}
+    # procedures: a light verb / generic head at the end is stripped when a named-procedure noun precedes
+    # ("лицензиялашни амалга ошириш", "экспертиза ўтказиш", "аккредитация қилиш", "медиация тартиб-таомилларини
+    # ўтказиш"); "тартиб(-таомил)" is also stripped after a >= 2-lemma verbal-noun name ("ишни … кўриш тартиби")
+    light_tails: ['amal oshirish', 'oʼtkazish', 'qilish', 'jarayon']
+    generic_heads: ['tartib taomil', 'tartib', 'taomil']
+    verbal_noun: '(?:ish|sh)$'
+    # never a remainder head of a light-verb strip ("давлат рўйхатидан ўтказиш" stays)
+    keep_before_light: [roʼyxat, hisob, nazorat, ovoz, xabardor]
+    # owner / abbreviation rewrites (regex on the folded key, per type; "*" = every type)
+    rewrites:
+      position:
+        - ['^spiker(?= )', 'qonunchilik palata spiker']
+        - ['^konsullik muassasa (?=.*attashe$)', '']
+        - ['^(bola huquq boʼyicha vakil) bola ombudsman$', '\1']
+        - ['^xalq deputat (?=(?:\S+ )*kengash deputat$)', '']
+      organ:
+        - ['^xalq deputat (?=(?:\S+ )*kengash$)', '']
+        # a named Senate committee: "Олий Мажлиси Сенатининг Суд-ҳуқуқ … қўмитаси" = "Суд-ҳуқуқ … қўмитаси"
+        - ['^senat (?=(?:\S+ ){3,}qoʼmita$)', '']
+      '*':
+        - ['(?:^| )республика узбекистан$', '']
+    # cross-language (RU -> UZ) and variant names of one entity: every name maps to the canonical's key.
+    # `ru` names are keyed with the Russian lemmatizer, `uz` names with the Uzbek one (R16 `aliases` are
+    # re-keyed here with both, since their keys were built with a guessed language).
+    pairs:
+      - {canonical: Омонатларни кафолатлаш агентлиги, ru: [Агентство по гарантированию вкладов]}
+      - {canonical: Вазирлар Маҳкамаси, ru: [Кабинет Министров]}
+      - {canonical: Иқтисодиёт ва молия вазирлиги, ru: [Министерство экономики и финансов]}
+      - {canonical: Адлия вазирлиги, ru: [Министерство юстиции]}
+      - {canonical: Ҳукумат, ru: [Правительство]}
+      - {canonical: ҳуқуқни муҳофаза қилувчи органлар, ru: [правоохранительные органы]}
+      - {canonical: республика ижро этувчи ҳокимият органлари, ru: [республиканские органы исполнительной власти]}
+      - {canonical: Молиявий барқарорлик кенгаши, ru: [Совет финансовой стабильности]}
+      - {canonical: суд, ru: [суд]}
+      - {canonical: Божхона қўмитаси, uz: [Davlat bojxona qoʼmitasi]}
+      - {canonical: Йўл ҳаракати хавфсизлиги хизмати, uz: [Давлат йўл ҳаракати хавфсизлиги хизмати]}
+      - {canonical: жазони ижро этиш муассасаси, uz: [жазони ижро этувчи муассаса]}
+      - {canonical: банкни тугатиш, ru: [Ликвидация банка]}
+      - {canonical: банкни санация қилиш, ru: [санация банка]}
+      - {canonical: мажбурий тугатиш, ru: [Принудительная ликвидация]}
+      - {canonical: банкни мажбурий тугатиш, ru: [принудительная ликвидация банка]}
+      - {canonical: ихтиёрий тугатиш, ru: [Добровольная ликвидация]}
+      - {canonical: жамиятдан чиқиш, uz: [жамият иштирокчисининг жамиятдан чиқиши]}
+      - {canonical: акциядорлар, ru: [акционер]}
+      - {canonical: банк акциядорлари, ru: [Акционеры банка]}
+      - {canonical: кредиторлар, ru: [кредитор]}
+      - {canonical: bank kreditorlari, ru: [кредиторы банка]}
+      - {canonical: омонатчилар, ru: [вкладчик]}
+      - {canonical: жисмоний шахслар, ru: [физическое лицо]}
+      - {canonical: юридик шахслар, ru: [юридическое лицо]}
+      - {canonical: учинчи шахслар, ru: [третьи лица]}
+      - {canonical: аудиторлик ташкилоти, ru: [аудиторская организация]}
+      - {canonical: потенциал олувчи, ru: [потенциальный приобретатель]}
+      - {canonical: Асосий жамият, ru: [основное общество]}
+      - {canonical: банклар гуруҳи, ru: [банковская группа]}
+      - {canonical: ишончнома, ru: [доверенность]}
+      - {canonical: санация қилинаётган банк кредиторлари, ru: [Кредиторы санируемого банка]}
+      - {canonical: санация қилинаётган банк омонатчилари, ru: [вкладчики санируемого банка]}
+      - {canonical: санация қилинаётган банк акциядорлари, ru: [акционеры санируемого банка]}
+      - {canonical: ota-ona, ru: [Ота-она]}
+      - {canonical: Иссиқхона газлари чиқарилишининг давлат ҳисоби, uz: [иссиқхона газлари чиқарилишининг давлат ҳисобини юритиш]}
+      - {canonical: Ишни тафтиш инстанцияси судида кўриш, uz: [Тафтиш инстанцияси судининг ишни кўриш]}
+      - {canonical: Тошкент вилояти ҳокимлиги, uz: [Тошкент вилояти ҳокимияти]}
+      - {canonical: давлат солиқ органлари, uz: [soliq organlari]}
+      - {canonical: tibbiyot xodimlari, uz: [tibbiy xodim]}
+      - {canonical: ота ёки она ёхуд уларнинг ўрнини босувчи шахс, uz: [ота, она ёки уларнинг ўрнини босувчи шахс]}
+      - {canonical: яккабошчилик асосидаги ижро этувчи органи вазифасини бажарувчи шахс, uz: [яккабошчилик асосидаги ижро этувчи органи вазифасини амалга оширувчи шахс]}
+      - {canonical: маъмурий ҳуқуқбузарлик содир этган шахс, uz: [маъмурий ҳуқуқбузарликларни содир этганлар]}
+      - {canonical: доимий яшайдиган чет эл фуқаролари, uz: [hududida doimiy yashaydigan chet el fuqarolari]}
+      - {canonical: доимий яшайдиган фуқаролиги бўлмаган шахслар, uz: [доимий яшовчи фуқаролиги бўлмаган шахслар]}
+      - {canonical: яккабошчилик асосидаги ижро этувчи органи, uz: [жамиятнинг яккабошчилик асосидаги ижро этувчи органи]}
+      - {canonical: Фракция раҳбари, uz: [Сиёсий партия фракциясининг раҳбари]}
+    # restores of false drops (item 3). Verify drops overruled when the entity matches:
+    restore:
+      position_last: [deputat]
+      position_keys: ['senat aʼzo']
+      # organ classes "… органлари" / subdivisions "… бўлинмалари" of a state body
+      organ_last: [organ, boʼlinma]
+      organ_state_markers: [davlat, hokimiyat, respublika]
+      organ_owner_heads: [vazirlik, inspeksiya, inspektsiya, qoʼmita, agentlik]
+      organ_generic_first: [masʼul, maxsus, ish, boshqa, tegishli, manfaatdor, nazorat, milliy]
+      # head-typing drops restored as legal_category (abstract head "ҳудуд" in a named legal territory)
+      legal_category_keys: ['bojxona hudud']
+    # an organ name "<ombudsman>нинг <… органлари>" fuses the post (genitive owner) with the bodies it
+    # addresses ("Bolalar ombudsmanining hududiy davlat organlari"): split into the post and the organ
+    split_owner_post: '(?i)^(?P<own>.*?(?:омбудсман|ombudsman|вакил|vakil)\w*?(?:нинг|ning))\s+(?P<rest>.+)$'
+    split_owner_rest_last: [organ]
+    # named research / educational institutions ("Davlat va huquq instituti") are neither state organs nor
+    # categories: a capitalised legal_category name with these heads is dropped
+    named_institution_heads: [institut, akademiya, universitet]
+    # "халқ депутатлари … Кенгашлари": the post word is a modifier inside the council's name -> no REGULATES
+    council_modifier_before: '(?i)(?:халқ|xalq)\s+$'
+    council_modifier_after: '(?i)^\w*(?:\s+[^\s.;:]+){0,5}?\s+(?:Кенгаш|Kengash)'
+  # --- R18 concept filters: no REGULATES -> concept when the concept is only the subject of legislation
+  # ("Рақобат тўғрисидаги қонунчилик …") or part of an organ name ("Давлат йўл ҳаракати хавфсизлиги хизмати")
+  concept_filters:
+    legislation_after: '^[»”"]?\s*(?:тўғрисидаги|to[ʻʼ''`‘’]g[ʻʼ''`‘’]risidagi|ҳақидаги|haqidagi|соҳасидаги|sohasidagi)\s+(?:қонунчилик|qonunchilik|қонун\s+ҳужжатлари|qonun\s+hujjatlari)'
+# Neo4j graph store (graphrag.kg.store; Task 10, Rulings R27 / R28)
+store:
+  # R28 (4): GraphStore.load_graph / drop_versions write only to these host:port (bolt:// or neo4j://): the dev
+  # compose grl-neo4j. The document write path (reconcile_structure) is not covered; M7 adds its explicit allow.
+  write_endpoints: ["localhost:7688", "127.0.0.1:7688"]
+  lock_stale_s: 600      # R28 (7): a load lock older than this may be broken with --break-stale-lock

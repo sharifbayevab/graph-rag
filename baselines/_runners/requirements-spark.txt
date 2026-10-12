@@ -1,0 +1,20 @@
+# Spark (aarch64, GB10, CUDA 13) env for both methods. torch from https://download.pytorch.org/whl/cu130 (torch 2.5.1,
+# the methods' pin, has no sm_121 build); everything else at the methods' pins where they exist.
+transformers==4.45.2
+sentence-transformers==3.3.1
+python-igraph==0.11.8
+networkx==3.4.2
+tiktoken==0.7.0
+pydantic==2.10.4
+tenacity==8.5.0
+openai==1.91.0
+httpx==0.28.1
+filelock==3.17.0
+packaging==24.2
+numpy==1.26.4
+pandas==2.2.3
+pyarrow==17.0.0
+boto3
+litellm==1.73.1
+einops
+tqdm
