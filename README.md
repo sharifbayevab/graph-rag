@@ -18,7 +18,6 @@ Test split, 212 questions, retrieval budget of up to 12 fragments per question.
 |---|---|---|
 | **GraphRAG-RL** | **0.890 ± 0.021** | **1953** |
 | [PropRAG](https://github.com/ReLink-Inc/PropRAG) ([paper](https://arxiv.org/abs/2504.18070)) | 0.635 ± 0.033 | 3372 |
-| Naive RAG (dense top-12) | 0.609 ± 0.033 | 3304 |
 | [HippoRAG 2](https://github.com/OSU-NLP-Group/HippoRAG) | 0.604 ± 0.033 | 3336 |
 
 ## Repository layout
